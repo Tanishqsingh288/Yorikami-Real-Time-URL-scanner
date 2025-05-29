@@ -1,0 +1,78 @@
+/* dashboard.css */
+
+body {
+  font-family: 'Poppins', sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.light-theme {
+  background-color: #f5f7fa;
+  color: #333;
+}
+
+.dark-theme {
+  background-color: #1e1e2f;
+  color: #f0f0f0;
+}
+
+header,
+footer {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+header img {
+  border-radius: 0;
+  animation: fadeIn 1s ease;
+}
+
+.btn {
+  transition: transform 0.2s ease;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+table {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  animation: fadeInUp 1s ease;
+}
+
+a {
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #0d6efd;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-menu {
+  animation: fadeIn 0.3s ease;
+}

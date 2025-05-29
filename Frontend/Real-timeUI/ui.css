@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #1e1e2f;
+  color: white;
+}
+
+.panel {
+  padding: 20px;
+  background: #292c36;
+  border-radius: 10px;
+}
+
+button {
+  background: #00c9a7;
+  color: #fff;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+}

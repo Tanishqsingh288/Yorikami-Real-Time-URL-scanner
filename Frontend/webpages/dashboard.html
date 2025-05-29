@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="../styling/dashboard.css" />
+</head>
+
+<body class="light-theme">
+  <!-- Header -->
+  <header class="bg-primary text-white py-3 d-flex justify-content-between align-items-center px-4">
+    <img src="../../logo.jpeg"  alt="Logo" height="70" />
+    <h3 class="m-0">User Dashboard</h3>
+    <button id="themeToggle" class="btn btn-light">Toggle Theme</button>
+  </header>
+
+  <!-- Controls Section -->
+  <section class="container my-4 d-flex flex-wrap gap-3 align-items-center">
+    <select class="form-select w-auto" id="sortDropdown">
+      <option selected disabled>Sort Orders</option>
+      <option value="time-asc">Time Asc</option>
+      <option value="time-desc">Time Desc</option>
+      <option value="risk-asc">Risk Asc</option>
+      <option value="risk-desc">Risk Desc</option>
+    </select>
+
+    <div class="dropdown">
+      <button class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">Manage Profile</button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="./uppass.html">Update Password</a></li>
+        <li><a class="dropdown-item" href="./upemail.html">Update Email</a></li>
+        <li><a class="dropdown-item" href="./deregister.html">Deregister Account</a></li>
+        <li><hr class="dropdown-divider" /></li>
+        <li><a class="dropdown-item" href="./logout.html">Logout</a></li>
+      </ul>
+    </div>
+
+    <button class="btn btn-warning" onclick="window.location.href='./feedbackform.html'">Send Feedback</button>
+    <button class="btn btn-info" onclick="window.location.href='./portfolio.html'">About the Developer</button>
+  </section>
+
+  <!-- URL Interaction Table -->
+  <div class="container my-4">
+    <table class="table table-hover table-bordered align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>S.No</th>
+          <th>URL</th>
+          <th>Timestamp</th>
+          <th>Actions</th>
+          <th>Rating</th>
+        </tr>
+      </thead>
+      <tbody id="historyTableBody">
+        <!-- Dynamic content inserted here -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-3 text-center">
+    <p class="mb-0">
+      Connect with Developer:
+      <a href="#" class="text-light mx-2">Instagram</a>
+      <a href="#" class="text-light mx-2">GitHub</a>
+      <a href="#" class="text-light mx-2">LinkedIn</a>
+    </p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../scripts/gethistory.js"></script>
+</body>
+
+</html>
