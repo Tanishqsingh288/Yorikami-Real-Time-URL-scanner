@@ -8,7 +8,7 @@ document.getElementById("updateEmailForm").addEventListener("submit", async func
   const sessionId = localStorage.getItem("sessionId");
 
   try {
-    const res = await fetch("http://13.60.254.185:5000/api/auth/update-email", {
+    const res = await fetch("https://yorikamiscanner.duckdns.org/api/auth/update-email", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

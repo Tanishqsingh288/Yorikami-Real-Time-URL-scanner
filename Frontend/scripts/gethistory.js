@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Delete URL
   window.deleteUrl = async function (url) {
     try {
-      const res = await fetch("http://13.60.254.185:5000/api/user/delete-url", {
+      const res = await fetch("https://yorikamiscanner.duckdns.org/api/user/delete-url", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

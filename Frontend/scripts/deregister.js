@@ -7,7 +7,7 @@ document.getElementById("deregisterForm").addEventListener("submit", async funct
   const sessionId = localStorage.getItem("sessionId");
 
   try {
-    const res = await fetch("http://13.60.254.185:5000/api/auth/delete", {
+    const res = await fetch("https://yorikamiscanner.duckdns.org/api/auth/delete", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

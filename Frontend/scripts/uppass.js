@@ -7,7 +7,7 @@ document.getElementById("updatePasswordForm").addEventListener("submit", async f
   const sessionId = localStorage.getItem("sessionId");
 
   try {
-    const res = await fetch("http://13.60.254.185:5000/api/auth/reset-password", {
+    const res = await fetch("https://yorikamiscanner.duckdns.org/api/auth/reset-password", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
