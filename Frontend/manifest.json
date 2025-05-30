@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "WebGuardX Full Frontend",
+  "version": "1.0",
+  "description": "Complete frontend UI for WebGuardX",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "Real-timeUI/ui.html",
+    "default_icon": {
+      "16": "Real-timeUI/icon.png",
+      "48": "Real-timeUI/icon.png",
+      "128": "Real-timeUI/icon.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["Real-timeUI/content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
