@@ -4,7 +4,7 @@ const toggleText = document.getElementById("toggleText");
 const formTitle = document.getElementById("formTitle");
 
 const BASE_URL =
-  "http://localhost:5000";
+  "http://13.60.254.185:5000";
 
 // ✅ Clear previous token on load
 window.addEventListener("DOMContentLoaded", () => {

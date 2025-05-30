@@ -76,7 +76,7 @@
     if (cache.has(url)) return;
 
     try {
-      const res = await fetch("http://localhost:5000/api/links/check", {
+      const res = await fetch("http://13.60.254.185:5000/api/links/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ urls: [url] })
@@ -114,7 +114,7 @@
 
     for (const item of unsafeUrls) {
       try {
-        const res = await fetch("http://localhost:5000/api/check/analyse", {
+        const res = await fetch("http://13.60.254.185:5000/api/check/analyse", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ url: item.url })

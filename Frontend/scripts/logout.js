@@ -6,7 +6,7 @@ document.getElementById("logoutForm").addEventListener("submit", async function 
   const sessionId = localStorage.getItem("sessionId");
 
   try {
-    const res = await fetch("http://localhost:5000/api/auth/logout", {
+    const res = await fetch("http://13.60.254.185:5000/api/auth/logout", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
