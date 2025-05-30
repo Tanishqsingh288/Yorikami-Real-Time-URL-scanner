@@ -12,9 +12,8 @@ const { submitFeedback } = require('./feedback/feedbackcontroller');
 dotenv.config();
 const app = express();
 
-app.use(cors({
-   origin: "http://127.0.0.1:5500", // or your frontend origin
-}));
+app.use(cors());
+
 app.use(express.json());
 
 connectDB(); // Connect to MongoDB
