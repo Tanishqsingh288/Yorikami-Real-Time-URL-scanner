@@ -2,7 +2,7 @@ const { evaluateResults } = require("../models/CheckResult");
 const { v4: uuidv4 } = require('uuid');
 
 const checkHttps = require('../checks/httpscheck');
-const checkSSL = require('../checks/sslCheck');
+const checkSSL = require('../checks/sslcheck');
 const checkGoogleSafeBrowsing = require('../checks/urlscanwithgsb');
 const checkDomainAuthenticity = require('../checks/tlddomaincheck');
 const checkSuspiciousContent = require('../checks/suscontentcheck');
