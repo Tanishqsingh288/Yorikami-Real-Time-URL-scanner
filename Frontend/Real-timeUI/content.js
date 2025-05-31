@@ -114,7 +114,7 @@
 
     for (const item of unsafeUrls) {
       try {
-        const res = await fetch("https://yorikamiscanner.duckdns.org/api/check/analyse", {
+        const res = await fetch("https://yorikamiscanner.duckdns.org/api/check/analyze", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ url: item.url })
