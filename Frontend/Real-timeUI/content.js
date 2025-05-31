@@ -56,7 +56,7 @@
 
   // Update timer during scan
   const timerInterval = setInterval(() => {
-    const elapsed = ((performance.now() - startTime)/1000).toFixed(2);
+    const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
     timeDisplay.textContent = `⏱️ ${elapsed}s elapsed`;
   }, 100);
 
@@ -98,7 +98,7 @@
 
   // Stop timer and show final time
   clearInterval(timerInterval);
-  const totalTime = ((performance.now() - startTime)/1000).toFixed(2);
+  const totalTime = ((performance.now() - startTime) / 1000).toFixed(2);
   timeDisplay.textContent = `✅ Scan completed in ${totalTime}s`;
 
   if (unsafeUrls.length === 0) {
@@ -107,7 +107,7 @@
     analyseBtn.style.display = "inline-block";
   }
 
-  // Deep Analyse handler
+  // ✅ Deep Analyse handler with 401 redirect
   analyseBtn.addEventListener("click", async () => {
     analyseBtn.disabled = true;
     analyseStatus.innerText = "⏳ Analysing...";
@@ -119,6 +119,14 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ url: item.url })
         });
+
+        if (res.status === 401) {
+          analyseStatus.innerText = "❌ Unauthorized. Redirecting to login...";
+          setTimeout(() => {
+            window.location.href = "/login"; // change path if needed
+          }, 1500);
+          return;
+        }
 
         if (res.ok) {
           console.log(`✅ Analysed: ${item.title}`);
