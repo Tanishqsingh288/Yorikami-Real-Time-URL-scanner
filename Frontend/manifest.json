@@ -24,5 +24,13 @@
       "js": ["Real-timeUI/content.js"],
       "run_at": "document_idle"
     }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "webpages/*.html"
+      ],
+      "matches": ["<all_urls>"]
+    }
   ]
 }
