@@ -123,7 +123,7 @@
         if (res.status === 401) {
           analyseStatus.innerText = "❌ Unauthorized. Redirecting to login...";
           setTimeout(() => {
-            window.location.href = "/login"; // change path if needed
+            window.location.href = "/webpages/auth.html"; // change path if needed
           }, 1500);
           return;
         }
