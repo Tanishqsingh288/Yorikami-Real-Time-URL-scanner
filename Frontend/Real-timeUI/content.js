@@ -121,7 +121,7 @@
         });
 
         if (res.status === 401) {
-          analyseStatus.innerText = "❌ Unauthorized. Redirecting to login...";
+          analyseStatus.innerText = "Redirecting...";
           setTimeout(() => {
             window.location.href = chrome.runtime.getURL('webpages/auth.html'); // change path if needed
           }, 1500);
