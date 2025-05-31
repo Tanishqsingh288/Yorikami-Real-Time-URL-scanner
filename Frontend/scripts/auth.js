@@ -20,7 +20,7 @@ window.addEventListener("DOMContentLoaded", () => {
   if (chrome?.storage?.local) {
     chrome.storage.local.get(["token", "sessionId"], (items) => {
       if (items.token && items.sessionId) {
-        window.location.href = "../webpages/dashboard.html";
+        window.location.href = chrome.runtime.getURL('webpages/dashboard.html');
       }
     });
   }
@@ -113,12 +113,12 @@ loginForm.addEventListener("submit", async function (e) {
           },
           () => {
             console.log("🔐 Token & Session saved to chrome.storage.local");
-            window.location.href = "../webpages/dashboard.html";
+            window.location.href = chrome.runtime.getURL('webpages/dashboard.html');;
           }
         );
       } else {
         console.warn("⚠️ chrome.storage.local not available");
-        window.location.href = "../webpages/dashboard.html";
+        window.location.href = chrome.runtime.getURL('webpages/dashboard.html');;
       }
     } else {
       throw new Error(data.error || "Login failed");
