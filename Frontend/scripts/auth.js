@@ -5,6 +5,17 @@ const formTitle = document.getElementById("formTitle");
 
 const BASE_URL = "https://yorikamiscanner.duckdns.org";
 
+// Attach click listener to toggle link inside toggleText
+function attachToggleListener() {
+  const toggleLink = document.getElementById("toggleLink");
+  if (toggleLink) {
+    toggleLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      toggleForms();
+    });
+  }
+}
+
 // ✅ Check if already logged in on load
 window.addEventListener("DOMContentLoaded", () => {
   // Check token from localStorage
@@ -24,6 +35,9 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  // Attach listener for toggle link on initial load
+  attachToggleListener();
 });
 
 function toggleForms() {
@@ -32,14 +46,17 @@ function toggleForms() {
   if (isLoginHidden) {
     loginForm.classList.remove("d-none");
     signupForm.classList.add("d-none");
-    toggleText.innerHTML = `Don't have an account? <a onclick='toggleForms()'>Signup</a>`;
+    toggleText.innerHTML = `Don't have an account? <a href="#" id="toggleLink">Signup</a>`;
     formTitle.innerText = "Login to YoriKami";
   } else {
     loginForm.classList.add("d-none");
     signupForm.classList.remove("d-none");
-    toggleText.innerHTML = `Already have an account? <a onclick='toggleForms()'>Login</a>`;
+    toggleText.innerHTML = `Already have an account? <a href="#" id="toggleLink">Login</a>`;
     formTitle.innerText = "Create your WebGuardX Account";
   }
+
+  // Re-bind event listener after innerHTML change
+  attachToggleListener();
 }
 
 // ✅ Signup
@@ -113,12 +130,12 @@ loginForm.addEventListener("submit", async function (e) {
           },
           () => {
             console.log("🔐 Token & Session saved to chrome.storage.local");
-            window.location.href = chrome.runtime.getURL('webpages/dashboard.html');;
+            window.location.href = chrome.runtime.getURL('webpages/dashboard.html');
           }
         );
       } else {
         console.warn("⚠️ chrome.storage.local not available");
-        window.location.href = chrome.runtime.getURL('webpages/dashboard.html');;
+        window.location.href = chrome.runtime.getURL('webpages/dashboard.html');
       }
     } else {
       throw new Error(data.error || "Login failed");
