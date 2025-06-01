@@ -18,6 +18,9 @@
       "128": "Real-timeUI/icon.png"
     }
   },
+  "background": {
+    "service_worker": "Real-timeUI/background.js"
+  },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
