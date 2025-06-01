@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Default fetch
   async function fetchHistory() {
     try {
-      const res = await fetch("http://13.60.254.185:5000/api/auth/history", {
+      const res = await fetch("https://yorikamiscanner.duckdns.org/api/auth/history", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!route) return;
 
     try {
-      const res = await fetch(`http://13.60.254.185:5000/api/user/${route}`, {
+      const res = await fetch(`https://yorikamiscanner.duckdns.org/api/user/${route}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "x-session-id": sessionId
@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Re-analyze
   window.reanalyze = async function (url) {
     try {
-      const res = await fetch("http://13.60.254.185:5000/api/user/reanalyze", {
+      const res = await fetch("https://yorikamiscanner.duckdns.org/api/user/reanalyze", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
