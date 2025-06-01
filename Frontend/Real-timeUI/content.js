@@ -2,7 +2,7 @@
   console.log("✅ Yorikami Realtime Scanner is running");
   const startTime = performance.now();
 
-  // Extract links efficiently
+  // Extract unique HTTP/HTTPS links
   const allLinks = Array.from(document.querySelectorAll("a"))
     .map(a => ({
       url: a.href.trim(),
@@ -10,7 +10,6 @@
     }))
     .filter(link => link.url.startsWith("http"));
 
-  // Remove duplicates
   const seen = new Set();
   const uniqueLinks = [];
   for (const link of allLinks) {
@@ -27,7 +26,7 @@
 
   console.log(`🔍 Found ${uniqueLinks.length} unique URLs`);
 
-  // Create UI
+  // Create floating popup
   const popup = document.createElement('div');
   popup.id = "webguardx-popup";
   popup.style = `
@@ -54,7 +53,7 @@
   const analyseStatus = document.getElementById('analyse-status');
   const timeDisplay = document.getElementById('scan-time');
 
-  // Update timer during scan
+  // Timer update
   const timerInterval = setInterval(() => {
     const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
     timeDisplay.textContent = `⏱️ ${elapsed}s elapsed`;
@@ -63,7 +62,6 @@
   const unsafeUrls = [];
   const cache = new Map();
 
-  // Process in parallel without artificial delays
   await Promise.allSettled(uniqueLinks.map(async ({ url, title }) => {
     if (url.startsWith("http://")) {
       const li = document.createElement('li');
@@ -96,7 +94,6 @@
     }
   }));
 
-  // Stop timer and show final time
   clearInterval(timerInterval);
   const totalTime = ((performance.now() - startTime) / 1000).toFixed(2);
   timeDisplay.textContent = `✅ Scan completed in ${totalTime}s`;
@@ -107,37 +104,38 @@
     analyseBtn.style.display = "inline-block";
   }
 
-  // ✅ Deep Analyse handler with 401 redirect
+  // Handle Deep Analyse
   analyseBtn.addEventListener("click", async () => {
     analyseBtn.disabled = true;
-    analyseStatus.innerText = "⏳ Analysing...";
+    analyseStatus.innerText = "⏳ Preparing Deep Analysis...";
 
-    for (const item of unsafeUrls) {
+    // Check authentication
+    chrome.storage.local.get(["token", "sessionId"], async (result) => {
+      const token = result.token;
+      const sessionId = result.sessionId;
+
+      if (!token || !sessionId) {
+        analyseStatus.innerText = "Redirecting to login...";
+        setTimeout(() => {
+          window.location.href = chrome.runtime.getURL('webpages/auth.html');
+        }, 1500);
+        return;
+      }
+
       try {
-        const res = await fetch("https://yorikamiscanner.duckdns.org/api/check/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: item.url })
+        // Store unsafeUrls in chrome.storage.local
+        await new Promise((resolve) => {
+          chrome.storage.local.set({ deepUrls: unsafeUrls }, resolve);
         });
 
-        if (res.status === 401) {
-          analyseStatus.innerText = "Redirecting...";
-          setTimeout(() => {
-            window.location.href = chrome.runtime.getURL('webpages/auth.html'); // change path if needed
-          }, 1500);
-          return;
-        }
-
-        if (res.ok) {
-          console.log(`✅ Analysed: ${item.title}`);
-        } else {
-          console.warn(`⚠️ Failed to analyse ${item.url}`);
-        }
+        analyseStatus.innerText = "🔁 Redirecting to dashboard...";
+        setTimeout(() => {
+          window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
+        }, 1000);
       } catch (err) {
-        console.error(`❌ Error analysing ${item.url}`, err);
+        console.error("❌ Failed to prepare analysis:", err);
+        analyseStatus.innerText = "❌ Failed to store data for analysis.";
       }
-    }
-
-    analyseStatus.innerText = "✅ Deep analysis complete!";
+    });
   });
 })();

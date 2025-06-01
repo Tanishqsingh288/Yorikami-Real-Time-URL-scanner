@@ -47,10 +47,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Default fetch
+  // Fetch history from backend
   async function fetchHistory() {
     try {
-      const res = await fetch("/api/auth/history", {
+      const res = await fetch("https://yorikamiscanner.duckdns.org/api/auth/history", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Re-analyze
+  // Re-analyze URL
   window.reanalyze = async function (url) {
     try {
       const res = await fetch("https://yorikamiscanner.duckdns.org/api/user/reanalyze", {
@@ -136,5 +136,54 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  fetchHistory(); // Initial history load
+  fetchHistory(); // Initial load
+
+  // ✅ Deep analysis if redirected from extension
+  chrome.storage?.local?.get(["deepUrls"], async (result) => {
+    const deepUrls = result.deepUrls;
+
+    if (!Array.isArray(deepUrls) || deepUrls.length === 0) return;
+
+    // Show popup
+    const analysingPopup = document.createElement("div");
+    analysingPopup.style = `
+      position: fixed; bottom: 20px; right: 20px;
+      background: #111; color: #fff; padding: 15px;
+      border-radius: 8px; z-index: 9999; font-family: Arial;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    `;
+    analysingPopup.textContent = "⏳ Analysing unsafe URLs...";
+    document.body.appendChild(analysingPopup);
+
+    try {
+      for (const item of deepUrls) {
+        const res = await fetch("https://yorikamiscanner.duckdns.org/api/check/analyze", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            "x-session-id": sessionId
+          },
+          body: JSON.stringify({ url: item.url })
+        });
+
+        if (res.ok) {
+          console.log(`✅ Analysed: ${item.url}`);
+        } else {
+          console.warn(`⚠️ Failed to analyse ${item.url}`);
+        }
+      }
+
+      analysingPopup.textContent = "✅ Deep analysis complete! Refreshing...";
+      setTimeout(() => {
+        analysingPopup.remove();
+        chrome.storage.local.remove("deepUrls");
+        fetchHistory();
+      }, 1500);
+    } catch (err) {
+      console.error("❌ Deep analysis failed:", err.message);
+      analysingPopup.textContent = "❌ Analysis failed.";
+      setTimeout(() => analysingPopup.remove(), 2000);
+    }
+  });
 });
