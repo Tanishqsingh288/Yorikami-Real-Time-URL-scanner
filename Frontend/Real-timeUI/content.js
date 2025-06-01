@@ -2,7 +2,6 @@
   console.log("✅ Yorikami Realtime Scanner is running");
   const startTime = performance.now();
 
-  // Extract unique HTTP/HTTPS links
   const allLinks = Array.from(document.querySelectorAll("a"))
     .map(a => ({
       url: a.href.trim(),
@@ -26,7 +25,6 @@
 
   console.log(`🔍 Found ${uniqueLinks.length} unique URLs`);
 
-  // Create floating popup
   const popup = document.createElement('div');
   popup.id = "webguardx-popup";
   popup.style = `
@@ -53,7 +51,6 @@
   const analyseStatus = document.getElementById('analyse-status');
   const timeDisplay = document.getElementById('scan-time');
 
-  // Timer update
   const timerInterval = setInterval(() => {
     const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
     timeDisplay.textContent = `⏱️ ${elapsed}s elapsed`;
@@ -104,40 +101,34 @@
     analyseBtn.style.display = "inline-block";
   }
 
-  // ✅ Deep Analyse handler
- // In your analyseBtn click handler:
-analyseBtn.addEventListener("click", async () => {
-  analyseBtn.disabled = true;
-  analyseStatus.innerText = "⏳ Preparing Deep Analysis...";
+  // ✅ Deep Analyse with reliable redirect
+  analyseBtn.addEventListener("click", async () => {
+    analyseBtn.disabled = true;
+    analyseStatus.innerText = "⏳ Preparing Deep Analysis...";
 
-  chrome.storage.local.get(["token", "sessionId"], async (result) => {
-    const token = result.token;
-    const sessionId = result.sessionId;
+    chrome.storage.local.get(["token", "sessionId"], (result) => {
+      const token = result.token;
+      const sessionId = result.sessionId;
 
-    if (!token || !sessionId) {
-      analyseStatus.innerText = "Redirecting to login...";
-      setTimeout(() => {
-        window.location.href = chrome.runtime.getURL('webpages/auth.html');
-      }, 1500);
-      return;
-    }
+      if (!token || !sessionId) {
+        analyseStatus.innerText = "Redirecting to login...";
+        setTimeout(() => {
+          window.location.href = chrome.runtime.getURL('webpages/auth.html');
+        }, 1500);
+        return;
+      }
 
-    try {
-      const unsafeOnly = unsafeUrls.map(item => item.url);
-
-      chrome.runtime.sendMessage(
-        { type: "STORE_AND_REDIRECT", urls: unsafeOnly },
-        () => {
-          analyseStatus.innerText = "🔁 Redirecting to dashboard...";
-          setTimeout(() => {
-            window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
-          }, 300); // Give a tiny delay for message handler to finish
+      chrome.storage.local.set({ deepUrls: unsafeUrls }, () => {
+        if (chrome.runtime.lastError) {
+          console.error("❌ Storage error:", chrome.runtime.lastError);
+          analyseStatus.innerText = "❌ Could not save scan data.";
+          return;
         }
-      );
-    } catch (err) {
-      console.error("❌ Failed to prepare deep analysis:", err);
-      analyseStatus.innerText = "❌ Failed to store URLs.";
-    }
+
+        console.log("✅ deepUrls stored:", unsafeUrls);
+        analyseStatus.innerText = "🔁 Redirecting to dashboard...";
+        window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
+      });
+    });
   });
-});
 })();
