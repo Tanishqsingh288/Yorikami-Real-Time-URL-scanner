@@ -28,7 +28,9 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "webpages/*.html"
+        "webpages/*.html",
+        "styling/*.js",
+        "scripts/*.css"
       ],
       "matches": ["<all_urls>"]
     }
