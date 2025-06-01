@@ -2,14 +2,12 @@
   console.log("✅ Yorikami Realtime Scanner is running");
   const startTime = performance.now();
 
-  // Test storage availability immediately
   chrome.storage.local.set({ storageTest: "test" }, () => {
     if (chrome.runtime.lastError) {
       console.error("❌ Initial storage test failed:", chrome.runtime.lastError);
     }
   });
 
-  // Use raw href attribute to check scheme, but keep resolved url for fetch and display
   const allLinks = Array.from(document.querySelectorAll("a"))
     .map(a => {
       const rawHref = (a.getAttribute("href") || "").trim();
@@ -19,7 +17,6 @@
         title: a.innerText.trim() || a.href.trim()
       };
     })
-    // filter only links with rawHref starting with http or protocol-relative //
     .filter(link => link.rawHref.startsWith("http") || link.rawHref.startsWith("//"));
 
   const seen = new Set();
@@ -73,14 +70,11 @@
   const cache = new Map();
 
   await Promise.allSettled(uniqueLinks.map(async ({ rawHref, url, title }) => {
-    // Now check rawHref instead of resolved url for http scheme
     if (rawHref.startsWith("http://")) {
       const li = document.createElement('li');
       li.innerHTML = `<span style="color: #ff884d;">⚠️ Insecure: ${title}</span>`;
       resultList.appendChild(li);
       unsafeUrls.push({ url, title });
-
-      // Store immediately when found
       chrome.storage.local.set({ deepUrls: unsafeUrls }, () => {
         if (chrome.runtime.lastError) {
           console.error("Storage error:", chrome.runtime.lastError);
@@ -89,7 +83,6 @@
       return;
     }
 
-    // Handle protocol-relative URLs (starting with //)
     if (rawHref.startsWith("//") && window.location.protocol === "http:") {
       const li = document.createElement('li');
       li.innerHTML = `<span style="color: #ff884d;">⚠️ Insecure Protocol-Relative: ${title}</span>`;
@@ -118,8 +111,6 @@
         li.innerHTML = `<span style="color: #ff4e4e;">🚨 Unsafe: ${title}</span>`;
         resultList.appendChild(li);
         unsafeUrls.push({ url, title });
-
-        // Store immediately when found
         chrome.storage.local.set({ deepUrls: unsafeUrls }, () => {
           if (chrome.runtime.lastError) {
             console.error("Storage error:", chrome.runtime.lastError);
@@ -137,11 +128,25 @@
   const totalTime = ((performance.now() - startTime) / 1000).toFixed(2);
   timeDisplay.textContent = `✅ Scan completed in ${totalTime}s`;
 
+  // ✅ Append [X] button after scan is completed
+  const closeBtn = document.createElement("span");
+  closeBtn.textContent = "✖";
+  closeBtn.style = `
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+  `;
+  closeBtn.addEventListener("click", () => popup.remove());
+  popup.appendChild(closeBtn);
+
   if (unsafeUrls.length === 0) {
     resultList.innerHTML = `<li style="color:lightgreen;">✅ No unsafe or insecure URLs found</li>`;
   } else {
     analyseBtn.style.display = "inline-block";
-    // Final storage update with all unsafe URLs
     chrome.storage.local.set({ deepUrls: unsafeUrls }, () => {
       if (chrome.runtime.lastError) {
         console.error("Final storage error:", chrome.runtime.lastError);
@@ -149,7 +154,6 @@
     });
   }
 
-  // Deep Analyse with reliable redirect and storage verification
   analyseBtn.addEventListener("click", async () => {
     analyseBtn.disabled = true;
     analyseStatus.innerText = "⏳ Preparing Deep Analysis...";
@@ -166,10 +170,8 @@
         return;
       }
 
-      // Verify storage before redirect
       chrome.storage.local.get("deepUrls", (storageResult) => {
         if (!storageResult.deepUrls || storageResult.deepUrls.length === 0) {
-          // If not found, store again
           chrome.storage.local.set({ deepUrls: unsafeUrls }, () => {
             if (chrome.runtime.lastError) {
               console.error("❌ Storage error:", chrome.runtime.lastError);
