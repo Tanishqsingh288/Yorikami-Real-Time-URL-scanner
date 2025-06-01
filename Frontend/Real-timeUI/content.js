@@ -9,12 +9,18 @@
     }
   });
 
+  // Use raw href attribute to check scheme, but keep resolved url for fetch and display
   const allLinks = Array.from(document.querySelectorAll("a"))
-    .map(a => ({
-      url: a.href.trim(),
-      title: a.innerText.trim() || a.href.trim()
-    }))
-    .filter(link => link.url.startsWith("http"));
+    .map(a => {
+      const rawHref = (a.getAttribute("href") || "").trim();
+      return {
+        rawHref,
+        url: a.href.trim(),
+        title: a.innerText.trim() || a.href.trim()
+      };
+    })
+    // filter only links with rawHref starting with http or protocol-relative //
+    .filter(link => link.rawHref.startsWith("http") || link.rawHref.startsWith("//"));
 
   const seen = new Set();
   const uniqueLinks = [];
@@ -66,14 +72,29 @@
   const unsafeUrls = [];
   const cache = new Map();
 
-  await Promise.allSettled(uniqueLinks.map(async ({ url, title }) => {
-    if (url.startsWith("http://")) {
+  await Promise.allSettled(uniqueLinks.map(async ({ rawHref, url, title }) => {
+    // Now check rawHref instead of resolved url for http scheme
+    if (rawHref.startsWith("http://")) {
       const li = document.createElement('li');
       li.innerHTML = `<span style="color: #ff884d;">⚠️ Insecure: ${title}</span>`;
       resultList.appendChild(li);
       unsafeUrls.push({ url, title });
-      
+
       // Store immediately when found
+      chrome.storage.local.set({ deepUrls: unsafeUrls }, () => {
+        if (chrome.runtime.lastError) {
+          console.error("Storage error:", chrome.runtime.lastError);
+        }
+      });
+      return;
+    }
+
+    // Handle protocol-relative URLs (starting with //)
+    if (rawHref.startsWith("//") && window.location.protocol === "http:") {
+      const li = document.createElement('li');
+      li.innerHTML = `<span style="color: #ff884d;">⚠️ Insecure Protocol-Relative: ${title}</span>`;
+      resultList.appendChild(li);
+      unsafeUrls.push({ url, title });
       chrome.storage.local.set({ deepUrls: unsafeUrls }, () => {
         if (chrome.runtime.lastError) {
           console.error("Storage error:", chrome.runtime.lastError);
@@ -97,7 +118,7 @@
         li.innerHTML = `<span style="color: #ff4e4e;">🚨 Unsafe: ${title}</span>`;
         resultList.appendChild(li);
         unsafeUrls.push({ url, title });
-        
+
         // Store immediately when found
         chrome.storage.local.set({ deepUrls: unsafeUrls }, () => {
           if (chrome.runtime.lastError) {
