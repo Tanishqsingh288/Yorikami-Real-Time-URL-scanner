@@ -105,34 +105,39 @@
   }
 
   // ✅ Deep Analyse handler
-  analyseBtn.addEventListener("click", async () => {
-    analyseBtn.disabled = true;
-    analyseStatus.innerText = "⏳ Preparing Deep Analysis...";
+ // In your analyseBtn click handler:
+analyseBtn.addEventListener("click", async () => {
+  analyseBtn.disabled = true;
+  analyseStatus.innerText = "⏳ Preparing Deep Analysis...";
 
-    chrome.storage.local.get(["token", "sessionId"], async (result) => {
-      const token = result.token;
-      const sessionId = result.sessionId;
+  chrome.storage.local.get(["token", "sessionId"], async (result) => {
+    const token = result.token;
+    const sessionId = result.sessionId;
 
-      if (!token || !sessionId) {
-        analyseStatus.innerText = "Redirecting to login...";
-        setTimeout(() => {
-          window.location.href = chrome.runtime.getURL('webpages/auth.html');
-        }, 1500);
-        return;
-      }
+    if (!token || !sessionId) {
+      analyseStatus.innerText = "Redirecting to login...";
+      setTimeout(() => {
+        window.location.href = chrome.runtime.getURL('webpages/auth.html');
+      }, 1500);
+      return;
+    }
 
-      try {
-        // ✅ Wait for storage to finish before redirect
-        await new Promise(resolve => {
-          chrome.storage.local.set({ deepUrls: unsafeUrls }, resolve);
-        });
+    try {
+      const unsafeOnly = unsafeUrls.map(item => item.url);
 
-        analyseStatus.innerText = "🔁 Redirecting to dashboard...";
-        window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
-      } catch (err) {
-        console.error("❌ Failed to store URLs for analysis:", err);
-        analyseStatus.innerText = "❌ Failed to store data for analysis.";
-      }
-    });
+      chrome.runtime.sendMessage(
+        { type: "STORE_AND_REDIRECT", urls: unsafeOnly },
+        () => {
+          analyseStatus.innerText = "🔁 Redirecting to dashboard...";
+          setTimeout(() => {
+            window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
+          }, 300); // Give a tiny delay for message handler to finish
+        }
+      );
+    } catch (err) {
+      console.error("❌ Failed to prepare deep analysis:", err);
+      analyseStatus.innerText = "❌ Failed to store URLs.";
+    }
   });
+});
 })();

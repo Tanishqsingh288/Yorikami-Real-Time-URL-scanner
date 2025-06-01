@@ -29,8 +29,8 @@
     {
       "resources": [
         "webpages/*.html",
-        "styling/*.js",
-        "scripts/*.css"
+        "styling/*.css",
+        "scripts/*.js"
       ],
       "matches": ["<all_urls>"]
     }

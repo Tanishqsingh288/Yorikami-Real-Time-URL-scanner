@@ -8,3 +8,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
   }
 });
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === "STORE_AND_REDIRECT" && Array.isArray(message.urls)) {
+    chrome.storage.local.set({ deepUrls: message.urls }, () => {
+      console.log("✅ deepUrls stored in background");
+      sendResponse({ success: true });
+    });
+    return true; // Keeps the message channel open for async response
+  }
+});
