@@ -1,10 +1,3 @@
-console.log("📦 Dashboard JS loaded");
-
-chrome.storage.local.get(null, (data) => {
-  console.log("🧠 chrome.storage.local contents:", data);
-});
-
-
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
   const sessionId = localStorage.getItem("sessionId");
@@ -37,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${new Date(item.timestamp).toLocaleString()}</td>
         <td>
           <button class="btn btn-sm btn-success" onclick="reanalyze('${item.url}')">Re-analyse</button>
-          <button class="btn btn-sm btn-danger delete-btn" data-url="${item.url}">Delete</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteUrl('${item.url}')">Delete</button>
         </td>
         <td><span class="badge bg-${getRatingColor(item.rating)}">${item.finalScore}/10 (${item.rating})</span></td>
       `;
