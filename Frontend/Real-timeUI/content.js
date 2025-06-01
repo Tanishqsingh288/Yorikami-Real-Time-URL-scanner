@@ -2,17 +2,23 @@
   console.log("✅ Yorikami Realtime Scanner is running");
   const startTime = performance.now();
 
-  // STEP 1: Extract all valid HTTP(S) links
-  const uniqueLinks = Array.from(
-    new Set(
-      [...document.querySelectorAll("a")]
-        .map(a => a.href.trim())
-        .filter(href => href.startsWith("http"))
-    )
-  ).map(url => ({
-    url,
-    title: (document.querySelector(`a[href="${url}"]`)?.innerText || url).trim()
-  }));
+  // Extract links efficiently
+  const allLinks = Array.from(document.querySelectorAll("a"))
+    .map(a => ({
+      url: a.href.trim(),
+      title: a.innerText.trim() || a.href.trim()
+    }))
+    .filter(link => link.url.startsWith("http"));
+
+  // Remove duplicates
+  const seen = new Set();
+  const uniqueLinks = [];
+  for (const link of allLinks) {
+    if (!seen.has(link.url)) {
+      seen.add(link.url);
+      uniqueLinks.push(link);
+    }
+  }
 
   if (uniqueLinks.length === 0) {
     console.warn("❌ No valid links found.");
@@ -21,21 +27,21 @@
 
   console.log(`🔍 Found ${uniqueLinks.length} unique URLs`);
 
-  // STEP 2: Create floating popup UI
+  // Create UI
   const popup = document.createElement('div');
-  popup.id = "yorikami-popup";
+  popup.id = "webguardx-popup";
   popup.style = `
     position: fixed; bottom: 20px; right: 20px;
-    background: #1c1c1e; color: #fff; padding: 15px;
+    background: #222; color: #fff; padding: 15px;
     border-radius: 10px; z-index: 999999;
-    max-height: 320px; overflow-y: auto;
-    font-size: 14px; font-family: 'Segoe UI', sans-serif;
-    box-shadow: 0 0 15px rgba(0,0,0,0.7);
-    width: 320px;
+    max-height: 300px; overflow-y: auto;
+    font-size: 14px; font-family: Arial, sans-serif;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    width: 300px;
   `;
   popup.innerHTML = `
-    <strong>🔒 Yorikami Scan:</strong><br>
-    <span id="scan-status">Scanning ${uniqueLinks.length} links...</span>
+    <b>🔒 Yorikami Scan:</b><br>
+    Scanning ${uniqueLinks.length} links...
     <div id="scan-time" style="font-size:12px;margin-top:5px;"></div>
     <ul id="result-list" style="padding-left: 20px; margin-top: 10px;"></ul>
     <button id="analyse-btn" style="margin-top: 10px; display:none; background:#00c9a7; color:white; border:none; padding:6px 10px; border-radius:5px; cursor:pointer;">Deep Analyse</button>
@@ -47,63 +53,64 @@
   const analyseBtn = document.getElementById('analyse-btn');
   const analyseStatus = document.getElementById('analyse-status');
   const timeDisplay = document.getElementById('scan-time');
-  const scanStatus = document.getElementById('scan-status');
 
-  // STEP 3: Timer display
+  // Update timer during scan
   const timerInterval = setInterval(() => {
     const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
     timeDisplay.textContent = `⏱️ ${elapsed}s elapsed`;
   }, 100);
 
   const unsafeUrls = [];
+  const cache = new Map();
 
-  // STEP 4: Parallel scanning of links
+  // Process in parallel without artificial delays
   await Promise.allSettled(uniqueLinks.map(async ({ url, title }) => {
-    const li = document.createElement('li');
-
     if (url.startsWith("http://")) {
+      const li = document.createElement('li');
       li.innerHTML = `<span style="color: #ff884d;">⚠️ Insecure: ${title}</span>`;
+      resultList.appendChild(li);
       unsafeUrls.push({ url, title });
-    } else {
-      try {
-        const res = await fetch("https://yorikamiscanner.duckdns.org/api/links/check", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ urls: [url] })
-        });
-
-        const data = await res.json();
-        if (data.unsafeUrls?.includes(url)) {
-          li.innerHTML = `<span style="color: #ff4e4e;">🚨 Unsafe: ${title}</span>`;
-          unsafeUrls.push({ url, title });
-        } else {
-          li.innerHTML = `<span style="color: #5eff7e;">✅ Safe: ${title}</span>`;
-        }
-      } catch (err) {
-        li.innerHTML = `<span style="color: #ffaa00;">⚠️ Error: ${title}</span>`;
-        console.error(`❌ Error checking ${url}`, err);
-      }
+      return;
     }
 
-    resultList.appendChild(li);
+    if (cache.has(url)) return;
+
+    try {
+      const res = await fetch("https://yorikamiscanner.duckdns.org/api/links/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ urls: [url] })
+      });
+
+      const data = await res.json();
+      if (data.unsafeUrls && data.unsafeUrls.includes(url)) {
+        const li = document.createElement('li');
+        li.innerHTML = `<span style="color: #ff4e4e;">🚨 Unsafe: ${title}</span>`;
+        resultList.appendChild(li);
+        unsafeUrls.push({ url, title });
+      } else {
+        cache.set(url, "safe");
+      }
+    } catch (err) {
+      console.error(`❌ Failed to check ${url}`, err);
+    }
   }));
 
-  // STEP 5: Finish scan
+  // Stop timer and show final time
   clearInterval(timerInterval);
   const totalTime = ((performance.now() - startTime) / 1000).toFixed(2);
   timeDisplay.textContent = `✅ Scan completed in ${totalTime}s`;
 
   if (unsafeUrls.length === 0) {
-    scanStatus.innerHTML = `<span style="color:lightgreen;">✅ All links are secure</span>`;
+    resultList.innerHTML = `<li style="color:lightgreen;">✅ No unsafe or insecure URLs found</li>`;
   } else {
-    scanStatus.innerHTML = `<span style="color:#ff6666;">⚠️ ${unsafeUrls.length} suspicious links detected</span>`;
     analyseBtn.style.display = "inline-block";
   }
 
-  // STEP 6: Deep Analyse handler
+  // ✅ Deep Analyse handler with 401 redirect
   analyseBtn.addEventListener("click", async () => {
     analyseBtn.disabled = true;
-    analyseStatus.innerText = "⏳ Analysing suspicious links...";
+    analyseStatus.innerText = "⏳ Analysing...";
 
     for (const item of unsafeUrls) {
       try {
@@ -114,24 +121,23 @@
         });
 
         if (res.status === 401) {
-          analyseStatus.innerText = "🔐 Redirecting for auth...";
+          analyseStatus.innerText = "Redirecting...";
           setTimeout(() => {
-            window.location.href = chrome.runtime.getURL('webpages/auth.html');
+            window.location.href = chrome.runtime.getURL('webpages/auth.html'); // change path if needed
           }, 1500);
           return;
         }
 
-        if (!res.ok) {
-          console.warn(`⚠️ Analysis failed for ${item.url}`);
-        } else {
+        if (res.ok) {
           console.log(`✅ Analysed: ${item.title}`);
+        } else {
+          console.warn(`⚠️ Failed to analyse ${item.url}`);
         }
       } catch (err) {
-        console.error(`❌ Deep analysis error for ${item.url}`, err);
+        console.error(`❌ Error analysing ${item.url}`, err);
       }
     }
 
     analyseStatus.innerText = "✅ Deep analysis complete!";
   });
-
 })();
