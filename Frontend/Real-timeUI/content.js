@@ -53,6 +53,7 @@
   const analyseStatus = document.getElementById('analyse-status');
   const timeDisplay = document.getElementById('scan-time');
 
+  // Timer update
   const timerInterval = setInterval(() => {
     const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
     timeDisplay.textContent = `⏱️ ${elapsed}s elapsed`;
@@ -66,7 +67,7 @@
       const li = document.createElement('li');
       li.innerHTML = `<span style="color: #ff884d;">⚠️ Insecure: ${title}</span>`;
       resultList.appendChild(li);
-      unsafeUrls.push(url); // Just URL string
+      unsafeUrls.push({ url, title });
       return;
     }
 
@@ -84,7 +85,7 @@
         const li = document.createElement('li');
         li.innerHTML = `<span style="color: #ff4e4e;">🚨 Unsafe: ${title}</span>`;
         resultList.appendChild(li);
-        unsafeUrls.push(url); // Just URL string
+        unsafeUrls.push({ url, title });
       } else {
         cache.set(url, "safe");
       }
@@ -103,13 +104,14 @@
     analyseBtn.style.display = "inline-block";
   }
 
-  // ✅ Deep Analyse Button Click
+  // ✅ Deep Analyse handler
   analyseBtn.addEventListener("click", async () => {
     analyseBtn.disabled = true;
     analyseStatus.innerText = "⏳ Preparing Deep Analysis...";
 
     chrome.storage.local.get(["token", "sessionId"], async (result) => {
-      const { token, sessionId } = result;
+      const token = result.token;
+      const sessionId = result.sessionId;
 
       if (!token || !sessionId) {
         analyseStatus.innerText = "Redirecting to login...";
@@ -120,17 +122,15 @@
       }
 
       try {
-        // ✅ Save only string URLs
-        await new Promise((resolve) => {
+        // ✅ Wait for storage to finish before redirect
+        await new Promise(resolve => {
           chrome.storage.local.set({ deepUrls: unsafeUrls }, resolve);
         });
 
         analyseStatus.innerText = "🔁 Redirecting to dashboard...";
-        setTimeout(() => {
-          window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
-        }, 1000);
+        window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
       } catch (err) {
-        console.error("❌ Failed to prepare analysis:", err);
+        console.error("❌ Failed to store URLs for analysis:", err);
         analyseStatus.innerText = "❌ Failed to store data for analysis.";
       }
     });
