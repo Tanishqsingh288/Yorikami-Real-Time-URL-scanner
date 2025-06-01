@@ -1,3 +1,10 @@
+console.log("📦 Dashboard JS loaded");
+
+chrome.storage.local.get(null, (data) => {
+  console.log("🧠 chrome.storage.local contents:", data);
+});
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem("token");
   const sessionId = localStorage.getItem("sessionId");
