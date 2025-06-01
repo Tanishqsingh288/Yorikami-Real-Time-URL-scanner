@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Default fetch
   async function fetchHistory() {
     try {
-      const res = await fetch("https://yorikamiscanner.duckdns.org/api/auth/history", {
+      const res = await fetch("/api/auth/history", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
