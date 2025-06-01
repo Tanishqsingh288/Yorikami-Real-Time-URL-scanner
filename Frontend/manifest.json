@@ -5,7 +5,8 @@
   "description": "Complete frontend UI for WebGuardX",
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+    "webNavigation"
   ],
   "host_permissions": [
     "<all_urls>"
