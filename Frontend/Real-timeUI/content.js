@@ -2,6 +2,13 @@
   console.log("✅ Yorikami Realtime Scanner is running");
   const startTime = performance.now();
 
+  // Test storage availability immediately
+  chrome.storage.local.set({ storageTest: "test" }, () => {
+    if (chrome.runtime.lastError) {
+      console.error("❌ Initial storage test failed:", chrome.runtime.lastError);
+    }
+  });
+
   const allLinks = Array.from(document.querySelectorAll("a"))
     .map(a => ({
       url: a.href.trim(),
@@ -65,6 +72,13 @@
       li.innerHTML = `<span style="color: #ff884d;">⚠️ Insecure: ${title}</span>`;
       resultList.appendChild(li);
       unsafeUrls.push({ url, title });
+      
+      // Store immediately when found
+      chrome.storage.local.set({ deepUrls: unsafeUrls }, () => {
+        if (chrome.runtime.lastError) {
+          console.error("Storage error:", chrome.runtime.lastError);
+        }
+      });
       return;
     }
 
@@ -83,6 +97,13 @@
         li.innerHTML = `<span style="color: #ff4e4e;">🚨 Unsafe: ${title}</span>`;
         resultList.appendChild(li);
         unsafeUrls.push({ url, title });
+        
+        // Store immediately when found
+        chrome.storage.local.set({ deepUrls: unsafeUrls }, () => {
+          if (chrome.runtime.lastError) {
+            console.error("Storage error:", chrome.runtime.lastError);
+          }
+        });
       } else {
         cache.set(url, "safe");
       }
@@ -99,9 +120,15 @@
     resultList.innerHTML = `<li style="color:lightgreen;">✅ No unsafe or insecure URLs found</li>`;
   } else {
     analyseBtn.style.display = "inline-block";
+    // Final storage update with all unsafe URLs
+    chrome.storage.local.set({ deepUrls: unsafeUrls }, () => {
+      if (chrome.runtime.lastError) {
+        console.error("Final storage error:", chrome.runtime.lastError);
+      }
+    });
   }
 
-  // ✅ Deep Analyse with reliable redirect
+  // Deep Analyse with reliable redirect and storage verification
   analyseBtn.addEventListener("click", async () => {
     analyseBtn.disabled = true;
     analyseStatus.innerText = "⏳ Preparing Deep Analysis...";
@@ -118,17 +145,27 @@
         return;
       }
 
-      chrome.storage.local.set({ deepUrls: unsafeUrls }, () => {
-        if (chrome.runtime.lastError) {
-          console.error("❌ Storage error:", chrome.runtime.lastError);
-          analyseStatus.innerText = "❌ Could not save scan data.";
-          return;
+      // Verify storage before redirect
+      chrome.storage.local.get("deepUrls", (storageResult) => {
+        if (!storageResult.deepUrls || storageResult.deepUrls.length === 0) {
+          // If not found, store again
+          chrome.storage.local.set({ deepUrls: unsafeUrls }, () => {
+            if (chrome.runtime.lastError) {
+              console.error("❌ Storage error:", chrome.runtime.lastError);
+              analyseStatus.innerText = "❌ Could not save scan data.";
+              return;
+            }
+            proceedWithRedirect();
+          });
+        } else {
+          proceedWithRedirect();
         }
+      });
 
-        console.log("✅ deepUrls stored:", unsafeUrls);
+      function proceedWithRedirect() {
         analyseStatus.innerText = "🔁 Redirecting to dashboard...";
         window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
-      });
+      }
     });
   });
 })();
