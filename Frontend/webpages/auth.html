@@ -23,7 +23,13 @@
           <label for="signupPassword" class="form-label">Password</label>
           <input type="password" class="form-control" id="signupPassword" required />
         </div>
-        <button type="submit" class="btn btn-primary w-100">Signup</button>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="signupConfirmCheckbox" />
+          <label class="form-check-label" for="signupConfirmCheckbox">
+            I will check my email for my Guard Code and keep it safe
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary w-100" id="signupSubmitBtn" disabled>Signup</button>
       </form>
 
       <!-- Login Form -->
@@ -44,11 +50,20 @@
       </form>
 
       <div class="tab-toggle mt-3" id="toggleText">
-  Already have an account? <a href="#" id="toggleLink">Login</a>
-</div>
+        Already have an account? <a href="#" id="toggleLink">Login</a>
+      </div>
     </div>
   </div>
 
   <script src="../scripts/auth.js"></script>
+  <script>
+    // Enable/Disable Signup button based on checkbox
+    const checkbox = document.getElementById("signupConfirmCheckbox");
+    const signupBtn = document.getElementById("signupSubmitBtn");
+
+    checkbox.addEventListener("change", () => {
+      signupBtn.disabled = !checkbox.checked;
+    });
+  </script>
 </body>
 </html>
