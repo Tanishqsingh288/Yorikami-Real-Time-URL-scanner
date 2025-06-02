@@ -5,77 +5,154 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>User Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="../bootstrap-5.0.2-dist/css/bootstrap.min.css" />
   <link rel="stylesheet" href="../styling/dashboard.css" />
 </head>
 
 <body class="light-theme">
-  <!-- Header -->
-  <header class="bg-primary text-white py-3 d-flex justify-content-between align-items-center px-4">
-    <img src="../graphical assests/logo.jpeg" alt="Logo" height="70" />
-    <h3 class="m-0">User Panel</h3>
-    <button id="themeToggle" class="btn btn-light">Toggle Theme</button>
-  </header>
+  <!-- Background Shapes -->
+  <div class="bg-shapes">
+    <div class="shape-1"></div>
+    <div class="shape-2"></div>
+    <div class="shape-3"></div>
+    <div class="shape-4"></div>
+  </div>
 
-  <!-- Controls Section -->
-  <section class="container my-4 d-flex flex-wrap gap-3 align-items-center">
-    <select class="form-select w-auto" id="sortDropdown">
-      <option selected disabled>Sort Orders</option>
-      <option value="time-asc">Time Asc</option>
-      <option value="time-desc">Time Desc</option>
-      <option value="risk-asc">Risk Asc</option>
-      <option value="risk-desc">Risk Desc</option>
-    </select>
+  <!-- Main Content Wrapper -->
+  <div class="main-content">
+    <!-- Header -->
+    <header class="dashboard-header">
+      <div class="container d-flex justify-content-between align-items-center">
+        <div class="logo-container">
+          <img src="logo.jpeg" alt="Logo" class="logo" />
+          <span class="logo-badge">PRO</span>
+        </div>
+        <h1 class="header-title">User Panel</h1>
+        <button id="themeToggle" class="theme-toggle btn">
+          <i class="fas fa-moon"></i>
+          <i class="fas fa-sun"></i>
+        </button>
+      </div>
+    </header>
 
-    <div class="dropdown">
-      <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Manage Profile
-  </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="./uppass.html">Update Password</a></li>
-        <li><a class="dropdown-item" href="./upemail.html">Update Email</a></li>
-        <li><a class="dropdown-item" href="./deregister.html">Deregister Account</a></li>
-        <li><hr class="dropdown-divider" /></li>
-        <li><a class="dropdown-item" href="./logout.html">Logout</a></li>
-      </ul>
+    <!-- Controls Section -->
+    <section class="container controls-section">
+      <div class="glass-card control-card p-3">
+        <select class="form-select bg-transparent border-0" id="sortDropdown">
+          <option selected disabled>Sort Orders</option>
+          <option value="time-asc">Time Asc</option>
+          <option value="time-desc">Time Desc</option>
+          <option value="risk-asc">Risk Asc</option>
+          <option value="risk-desc">Risk Desc</option>
+        </select>
+      </div>
+
+      <div class="dropdown">
+        <button class="glass-card control-card btn dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="fas fa-user-cog me-2"></i>
+          <span>Manage Profile</span>
+        </button>
+        <ul class="dropdown-menu glass-dropdown">
+          <li><a class="dropdown-item" href="./uppass.html"><i class="fas fa-key me-2"></i>Update Password</a></li>
+          <li><a class="dropdown-item" href="./upemail.html"><i class="fas fa-envelope me-2"></i>Update Email</a></li>
+          <li><a class="dropdown-item" href="./deregister.html"><i class="fas fa-user-slash me-2"></i>Deregister Account</a></li>
+          <li><hr class="dropdown-divider" /></li>
+          <li><a class="dropdown-item text-danger" href="./logout.html"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+        </ul>
+      </div>
+
+      <a href="./feedbackform.html" class="glass-card control-card btn btn-warning d-flex align-items-center" role="button">
+        <i class="fas fa-comment-alt me-2"></i>
+        <span>Send Feedback</span>
+      </a>
+      
+      <a href="./portfolio.html" class="glass-card control-card btn btn-info d-flex align-items-center" role="button">
+        <i class="fas fa-code me-2"></i>
+        <span>About Developer</span>
+      </a>
+    </section>
+
+    <!-- URL Interaction Table -->
+    <div class="container table-container glass-card">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-header">
+            <tr>
+              <th class="ps-4">S.No</th>
+              <th>URL</th>
+              <th>Timestamp</th>
+              <th>Actions</th>
+              <th class="pe-4">Rating</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <!-- Sample rows - will be dynamically populated -->
+            <tr>
+              <td class="ps-4">1</td>
+              <td>https://example.com</td>
+              <td>2023-06-15 14:30</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary me-2"><i class="fas fa-eye"></i></button>
+                <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+              </td>
+              <td class="pe-4">
+                <div class="rating-stars">
+                  <i class="fas fa-star text-warning"></i>
+                  <i class="fas fa-star text-warning"></i>
+                  <i class="fas fa-star text-warning"></i>
+                  <i class="fas fa-star-half-alt text-warning"></i>
+                  <i class="far fa-star text-warning"></i>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="ps-4">2</td>
+              <td>https://test-site.org</td>
+              <td>2023-06-14 09:15</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary me-2"><i class="fas fa-eye"></i></button>
+                <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+              </td>
+              <td class="pe-4">
+                <div class="rating-stars">
+                  <i class="fas fa-star text-warning"></i>
+                  <i class="fas fa-star text-warning"></i>
+                  <i class="far fa-star text-warning"></i>
+                  <i class="far fa-star text-warning"></i>
+                  <i class="far fa-star text-warning"></i>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-
-    <a href="./feedbackform.html" class="btn btn-warning" role="button">Send Feedback</a>
-    <a href="./portfolio.html" class="btn btn-info" role="button">About the Developer</a>
-  </section>
-
-  <!-- URL Interaction Table -->
-  <div class="container my-4">
-    <table class="table table-hover table-bordered align-middle">
-      <thead class="table-light">
-        <tr>
-          <th>S.No</th>
-          <th>URL</th>
-          <th>Timestamp</th>
-          <th>Actions</th>
-          <th>Rating</th>
-        </tr>
-      </thead>
-      <tbody id="historyTableBody">
-        <!-- Dynamic content inserted here -->
-      </tbody>
-    </table>
   </div>
 
   <!-- Footer -->
-  <footer class="bg-dark text-white py-3 text-center">
-    <p class="mb-0">
-      Connect with Developer:
-      <a href="https://www.instagram.com/tanishqsingh6.9/" class="text-light mx-2">Instagram</a>
-      <a href="https://github.com/Tanishqsingh288" class="text-light mx-2">GitHub</a>
-      <a href="https://www.linkedin.com/in/tanishq-singh-3249b135b/" class="text-light mx-2">LinkedIn</a>
-    </p>
+  <footer class="footer">
+    <div class="footer-wave"></div>
+    <div class="footer-content container">
+      <p class="mb-0">
+        Connect with Developer:
+        <a href="https://www.instagram.com/tanishqsingh6.9/" class="text-light mx-2"><i class="fab fa-instagram"></i></a>
+        <a href="https://github.com/Tanishqsingh288" class="text-light mx-2"><i class="fab fa-github"></i></a>
+        <a href="https://www.linkedin.com/in/tanishq-singh-3249b135b/" class="text-light mx-2"><i class="fab fa-linkedin"></i></a>
+      </p>
+    </div>
   </footer>
 
+  <!-- Floating Action Button -->
+  <button class="fab" id="quickActionBtn">
+    <i class="fas fa-plus"></i>
+  </button>
+
   <script src="../bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../scripts/dashboard-analysis.js"></script>
+   <script src="../scripts/dashboard-analysis.js"></script>
   <script src="../scripts/gethistory.js"></script>
+  <script src="../scripts/dashanimation.js"></script>
 </body>
 
 </html>
