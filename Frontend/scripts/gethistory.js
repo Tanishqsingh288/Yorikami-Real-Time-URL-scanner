@@ -7,26 +7,39 @@ document.addEventListener("DOMContentLoaded", () => {
   const sortDropdown = document.getElementById("sortDropdown");
   const body = document.body;
 
-  // Redirect if not authenticated
   if (!token || !sessionId) {
     window.location.href = "../auth/auth.html";
     return;
   }
 
-  // Theme toggle
   toggleBtn.addEventListener("click", () => {
     body.classList.toggle("dark-theme");
     body.classList.toggle("light-theme");
   });
 
-  // Render table
   function renderTable(history) {
     historyTableBody.innerHTML = "";
     history.forEach((item, index) => {
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${index + 1}</td>
-        <td><a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.url}</a></td>
+        <td>
+          <a href="${item.url}" target="_blank" rel="noopener noreferrer"
+            style="
+              display: -webkit-box;
+              -webkit-line-clamp: 3;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              word-break: break-word;
+              white-space: normal;
+              line-height: 1.4;
+              max-width: 400px;
+            "
+          >
+            ${item.url}
+          </a>
+        </td>
         <td>${new Date(item.timestamp).toLocaleString()}</td>
         <td>
           <button class="btn btn-sm btn-success reanalyze-btn" data-url="${item.url}">Re-analyse</button>
@@ -37,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
       historyTableBody.appendChild(row);
     });
 
-    // Attach event listeners to dynamically created buttons
     document.querySelectorAll(".reanalyze-btn").forEach(btn => {
       btn.addEventListener("click", () => reanalyze(btn.dataset.url));
     });
@@ -46,7 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Get badge color
   function getRatingColor(rating) {
     switch (rating) {
       case "SAFE": return "success";
@@ -55,7 +66,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Fetch history from backend
   async function fetchHistory() {
     try {
       const res = await fetch("https://yorikamiscanner.duckdns.org/api/auth/history", {
@@ -74,7 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Sorting handler
   sortDropdown.addEventListener("change", async (e) => {
     const selected = e.target.value;
     const routeMap = {
@@ -104,7 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Re-analyze URL
   window.reanalyze = async function (url) {
     try {
       const res = await fetch("https://yorikamiscanner.duckdns.org/api/user/reanalyze", {
@@ -124,7 +132,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // Delete URL
   window.deleteUrl = async function (url) {
     try {
       const res = await fetch("https://yorikamiscanner.duckdns.org/api/user/delete-url", {
@@ -144,15 +151,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  fetchHistory(); // Initial load
+  fetchHistory();
 
-  // ✅ Deep analysis if redirected from extension
   chrome.storage?.local?.get(["deepUrls"], async (result) => {
     const deepUrls = result.deepUrls;
 
     if (!Array.isArray(deepUrls) || deepUrls.length === 0) return;
 
-    // Show popup
     const analysingPopup = document.createElement("div");
     analysingPopup.style = `
       position: fixed; bottom: 20px; right: 20px;
