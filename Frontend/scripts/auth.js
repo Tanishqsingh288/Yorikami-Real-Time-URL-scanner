@@ -164,3 +164,10 @@ loginForm.addEventListener("submit", async function (e) {
     alert("❌ Login error: " + (err?.message || "Unknown error"));
   }
 });
+// Enable/Disable Signup button based on checkbox
+    const checkbox = document.getElementById("signupConfirmCheckbox");
+    const signupBtn = document.getElementById("signupSubmitBtn");
+
+    checkbox.addEventListener("change", () => {
+      signupBtn.disabled = !checkbox.checked;
+    });
