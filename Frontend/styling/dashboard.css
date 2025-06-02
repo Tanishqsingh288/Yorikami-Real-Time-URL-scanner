@@ -13,14 +13,28 @@
 }
 
 /* Base Styles */
-body {
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
   font-family: 'Poppins', sans-serif;
   transition: all 0.5s cubic-bezier(0.65, 0.05, 0.36, 1);
+  background-color: var(--light-bg);
+  color: var(--text-dark);
+}
+
+/* Make body a flex container to push footer down */
+body {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  background-color: var(--light-bg);
-  color: var(--text-dark);
+}
+
+/* Main content wrapper (you need to wrap your page content inside this) */
+.main-content {
+  flex: 1 0 auto; /* Grow and take available space */
 }
 
 /* Background Shapes Animation */
@@ -289,6 +303,7 @@ body {
   padding: 2rem 0 0;
   position: relative;
   margin-top: 3rem;
+  flex-shrink: 0; /* Don't shrink footer */
 }
 
 .footer-wave {
@@ -297,59 +312,35 @@ body {
   left: 0;
   width: 100%;
   height: 50px;
-  background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="%234361ee" opacity=".25"/><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" fill="%234361ee" opacity=".5"/><path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="%234361ee"/></svg>');
+  background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="%234361ee" opacity=".25"/><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,70.94c41.07,29.17,103.15,18.17,158,12,70.36-8,136.33-30.25,206.8-33.57C438.64,41,512.34,51.67,583,61.19c69.27,9.13,138.3,8.3,209.4-3.43,36.15-6.63,69.85-18.36,104.45-29.49C989.49,8,1113-14,1200,52.47V0Z" fill="%234361ee" opacity=".5"/><path d="M0,0V5.63C13,21.39,27.64,34.63,47.69,42.91c41.07,17.19,103.15,10.72,158,8.62,70.36-3,136.33-13.68,206.8-15.22C438.64,32.03,512.34,36,583,37.45c69.27,1.4,138.3-1.19,209.4-6.51,36.15-3,69.85-8.21,104.45-12.17C989.49,10,1113-4,1200,52.47V0Z" fill="%234361ee"/></svg>') no-repeat;
   background-size: cover;
+  pointer-events: none;
+  z-index: 5;
 }
 
-.footer-text {
-  margin-bottom: 1.5rem;
-  text-align: center;
+.footer-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem 0 2rem;
+  font-weight: 600;
+  font-size: 0.8rem;
 }
 
-.social-link {
-  color: white;
-  font-size: 1.5rem;
-  margin: 0 0.75rem;
-  transition: all 0.3s ease;
-  display: inline-block;
-}
-
-.social-link:hover {
-  color: var(--accent-color);
-  transform: translateY(-5px) scale(1.2);
-}
-
-/* Animations */
+/* Float animation */
 @keyframes float {
   0%, 100% {
-    transform: translateY(0) translateX(0);
+    transform: translateY(0);
   }
   50% {
-    transform: translateY(-20px) translateX(10px);
+    transform: translateY(-20px);
   }
 }
 
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-/* Responsive Adjustments */
+/* Responsive tweaks (optional) */
 @media (max-width: 768px) {
   .controls-section {
     flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .control-card {
-    width: 100%;
-  }
-  
-  .table-container {
-    padding: 0.5rem;
+    align-items: center;
   }
 }
