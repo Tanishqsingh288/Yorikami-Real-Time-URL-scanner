@@ -11,13 +11,21 @@ window.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Add UI feedback
+    // UI feedback element
     const analyseStatus = document.createElement("div");
     analyseStatus.id = "analysis-status";
     analyseStatus.innerText = "⏳ Analysing unsafe URLs...";
-    analyseStatus.style = "margin: 10px; padding: 8px; background: #ffe08a; color: #333; font-weight: bold; border-radius: 5px;";
+    analyseStatus.style = `
+      margin: 10px; 
+      padding: 8px; 
+      background: #ffe08a; 
+      color: #333; 
+      font-weight: bold; 
+      border-radius: 5px;
+    `;
     document.body.prepend(analyseStatus);
 
+    // Loop through and process each URL
     for (const url of deepUrls) {
       try {
         console.log(`📡 Sending analysis request for: ${url}`);
@@ -42,15 +50,17 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    // Once all URLs have been processed:
     analyseStatus.innerText = "✅ Deep analysis complete!";
     analyseStatus.style.background = "#a4f9c8";
     analyseStatus.style.color = "#0a0";
 
-    // Remove the status message after 3 seconds
+    // Remove the message after 3 seconds
     setTimeout(() => {
       analyseStatus.remove();
     }, 3000);
 
+    // Clear the deepUrls from storage
     chrome.storage.local.remove("deepUrls", () => {
       console.log("🧹 Removed deepUrls from storage after analysis.");
     });
