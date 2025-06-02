@@ -8,6 +8,35 @@
     }
   });
 
+  // Function to display server error message
+  function showServerError() {
+    const existingError = document.getElementById('server-error-message');
+    if (existingError) return;
+
+    const errorDiv = document.createElement('div');
+    errorDiv.id = 'server-error-message';
+    errorDiv.style.position = 'fixed';
+    errorDiv.style.top = '20px';
+    errorDiv.style.right = '20px';
+    errorDiv.style.backgroundColor = '#ffebee';
+    errorDiv.style.color = '#c62828';
+    errorDiv.style.padding = '15px';
+    errorDiv.style.borderRadius = '5px';
+    errorDiv.style.border = '1px solid #ef9a9a';
+    errorDiv.style.zIndex = '999999';
+    errorDiv.style.maxWidth = '300px';
+    errorDiv.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+    errorDiv.textContent = '⚠️ Server is down. Please try again later.';
+
+    document.body.appendChild(errorDiv);
+
+    setTimeout(() => {
+      if (errorDiv.parentNode) {
+        errorDiv.parentNode.removeChild(errorDiv);
+      }
+    }, 5000);
+  }
+
   const allLinks = Array.from(document.querySelectorAll("a"))
     .map(a => {
       const rawHref = (a.getAttribute("href") || "").trim();
@@ -68,6 +97,7 @@
 
   const unsafeUrls = [];
   const cache = new Map();
+  let serverErrorOccurred = false;
 
   await Promise.allSettled(uniqueLinks.map(async ({ rawHref, url, title }) => {
     if (rawHref.startsWith("http://")) {
@@ -102,8 +132,13 @@
       const res = await fetch("https://yorikamiscanner.duckdns.org/api/links/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ urls: [url] })
+        body: JSON.stringify({ urls: [url] }),
+        signal: AbortSignal.timeout(5000) // 5 second timeout
       });
+
+      if (!res.ok) {
+        throw new Error(`Server responded with status ${res.status}`);
+      }
 
       const data = await res.json();
       if (data.unsafeUrls && data.unsafeUrls.includes(url)) {
@@ -121,6 +156,12 @@
       }
     } catch (err) {
       console.error(`❌ Failed to check ${url}`, err);
+      if (!serverErrorOccurred && (err.message.includes('Failed to fetch') || 
+          err.message.includes('NetworkError') || 
+          err.name === 'AbortError')) {
+        serverErrorOccurred = true;
+        showServerError();
+      }
     }
   }));
 
@@ -128,7 +169,7 @@
   const totalTime = ((performance.now() - startTime) / 1000).toFixed(2);
   timeDisplay.textContent = `✅ Scan completed in ${totalTime}s`;
 
-  // ✅ Append [X] button after scan is completed
+  // Append [X] button after scan is completed
   const closeBtn = document.createElement("span");
   closeBtn.textContent = "✖";
   closeBtn.style = `
@@ -143,8 +184,10 @@
   closeBtn.addEventListener("click", () => popup.remove());
   popup.appendChild(closeBtn);
 
-  if (unsafeUrls.length === 0) {
+  if (unsafeUrls.length === 0 && !serverErrorOccurred) {
     resultList.innerHTML = `<li style="color:lightgreen;">✅ No unsafe or insecure URLs found</li>`;
+  } else if (serverErrorOccurred) {
+    resultList.innerHTML += `<li style="color:#ff884d;">⚠️ Some URLs couldn't be checked (server issue)</li>`;
   } else {
     analyseBtn.style.display = "inline-block";
     chrome.storage.local.set({ deepUrls: unsafeUrls }, () => {
