@@ -187,7 +187,7 @@
   if (unsafeUrls.length === 0 && !serverErrorOccurred) {
     resultList.innerHTML = `<li style="color:lightgreen;">✅ No unsafe or insecure URLs found</li>`;
   } else if (serverErrorOccurred) {
-    resultList.innerHTML += `<li style="color:#ff884d;">⚠️ Some URLs couldn't be checked (server issue)</li>`;
+    resultList.innerHTML += `<li style="color:#ff884d;">⚠️ Server is Down. Please Try again later.</li>`;
   } else {
     analyseBtn.style.display = "inline-block";
     chrome.storage.local.set({ deepUrls: unsafeUrls }, () => {
