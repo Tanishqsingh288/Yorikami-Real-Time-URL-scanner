@@ -29,12 +29,20 @@ document.addEventListener("DOMContentLoaded", () => {
         <td><a href="${item.url}" target="_blank" rel="noopener noreferrer">${item.url}</a></td>
         <td>${new Date(item.timestamp).toLocaleString()}</td>
         <td>
-          <button class="btn btn-sm btn-success" onclick="reanalyze('${item.url}')">Re-analyse</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteUrl('${item.url}')">Delete</button>
+          <button class="btn btn-sm btn-success reanalyze-btn" data-url="${item.url}">Re-analyse</button>
+          <button class="btn btn-sm btn-danger delete-btn" data-url="${item.url}">Delete</button>
         </td>
         <td><span class="badge bg-${getRatingColor(item.rating)}">${item.finalScore}/10 (${item.rating})</span></td>
       `;
       historyTableBody.appendChild(row);
+    });
+
+    // Attach event listeners to dynamically created buttons
+    document.querySelectorAll(".reanalyze-btn").forEach(btn => {
+      btn.addEventListener("click", () => reanalyze(btn.dataset.url));
+    });
+    document.querySelectorAll(".delete-btn").forEach(btn => {
+      btn.addEventListener("click", () => deleteUrl(btn.dataset.url));
     });
   }
 
