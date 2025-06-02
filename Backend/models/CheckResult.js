@@ -5,54 +5,83 @@ function evaluateResults(checks) {
 
   // Define messages that indicate critical failures
   const criticalFailureMessages = [
-    "flagged as unsafe",
-    //"Error checking third-party scripts"
+    "flagged as unsafe"
+    // "Error checking third-party scripts"
   ];
 
-  // Check for critical failures first
-  const hasCriticalFailure = checks.some(check =>
-    criticalFailureMessages.some(msg =>
-      check.message.includes(msg) && !check.passed
-    )
-  );
+  try {
+    // Check for critical failures first
+    const hasCriticalFailure = checks.some(check => {
+      try {
+        return criticalFailureMessages.some(msg =>
+          check.message.includes(msg) && !check.passed
+        );
+      } catch (err) {
+        // If any error while checking this, ignore for now
+        return false;
+      }
+    });
 
-  if (hasCriticalFailure) {
-    // Return immediately with UNSAFE rating if critical failure found
+    if (hasCriticalFailure) {
+      return {
+        pointsEarned: 0,
+        totalPossible,
+        finalScore: 0,
+        rating: 'UNSAFE',
+        details: checks
+      };
+    }
+
+    // If no critical failures, continue scoring normally
+    checks.forEach(check => {
+      try {
+        pointsEarned += check.score;
+        details.push(check);
+      } catch (err) {
+        // If error occurs in processing this check, give 3 points
+        pointsEarned += 3;
+        details.push({
+          message: 'Error processing check',
+          passed: false,
+          score: 3,
+          error: err.message
+        });
+      }
+    });
+
+    // Calculate final score scaled to 10
+    const finalScore = Math.round((pointsEarned / totalPossible) * 10);
+    const rating = getRating(finalScore);
+
     return {
-      pointsEarned: 0,
+      pointsEarned,
       totalPossible,
-      finalScore: 0,
+      finalScore,
+      rating,
+      details
+    };
+
+  } catch (error) {
+    // Global catch – if something really unexpected goes wrong
+    return {
+      pointsEarned: 3,
+      totalPossible,
+      finalScore: 3,
       rating: 'UNSAFE',
-      details: checks
+      details: [{
+        message: 'Critical system error during evaluation',
+        passed: false,
+        score: 3,
+        error: error.message
+      }]
     };
   }
-
-  // If no critical failures, continue scoring normally
-  checks.forEach(check => {
-    pointsEarned += check.score;
-    details.push(check);
-  });
-
-  // Calculate final score scaled to 10
-  const finalScore = Math.round((pointsEarned / totalPossible) * 10);
-
-  // Use the updated getRating function to map score to rating
-  const rating = getRating(finalScore);
-
-  return {
-    pointsEarned,
-    totalPossible,
-    finalScore,
-    rating,
-    details
-  };
 }
 
 function getRating(score) {
   if (score >= 7 && score <= 10) return 'SAFE';
   if (score >= 4 && score <= 6) return 'RISKY';
   if (score >= 0 && score <= 3) return 'UNSAFE';
-  // fallback if score is out of range
   return 'UNSAFE';
 }
 
