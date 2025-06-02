@@ -4,87 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Feedback Form</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
-    body {
-      background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
-      font-family: 'Poppins', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .feedback-container {
-      background: #fff;
-      padding: 2rem 3rem;
-      border-radius: 15px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-      max-width: 450px;
-      width: 100%;
-      text-align: center;
-    }
-
-    h2 {
-      margin-bottom: 1rem;
-      color: #333;
-    }
-
-    label {
-      display: block;
-      margin: 1rem 0 0.5rem;
-      text-align: left;
-      font-weight: 600;
-      color: #555;
-    }
-
-    input[type="email"],
-    textarea {
-      width: 100%;
-      padding: 12px 15px;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: border-color 0.3s ease;
-      resize: vertical;
-    }
-
-    input[type="email"]:focus,
-    textarea:focus {
-      border-color: #6a9ae2;
-      outline: none;
-    }
-
-    textarea {
-      min-height: 120px;
-    }
-
-    button {
-      margin-top: 1.5rem;
-      background: #6a9ae2;
-      color: white;
-      border: none;
-      padding: 12px 25px;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      width: 100%;
-    }
-
-    button:hover {
-      background: #557ac9;
-    }
-
-    .message {
-      margin-top: 1rem;
-      font-weight: 600;
-      color: #333;
-      min-height: 24px;
-    }
-  </style>
+  <link rel="stylesheet" href="../styling/feedbackform.css"/>
 </head>
 <body>
 
@@ -101,46 +21,7 @@
     </form>
     <div class="message" id="message"></div>
   </div>
-
-  <script>
-    const form = document.getElementById('feedbackForm');
-    const messageEl = document.getElementById('message');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      messageEl.textContent = '';
-      const source = form.source.value.trim();
-      const content = form.content.value.trim();
-
-      if (!source || !content) {
-        messageEl.style.color = 'red';
-        messageEl.textContent = 'Please fill in all fields.';
-        return;
-      }
-
-      try {
-        const res = await fetch('https://yorikamiscanner.duckdns.org/api/feedback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ source, content })
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-          messageEl.style.color = 'green';
-          messageEl.textContent = data.message || 'Thank you for your feedback!';
-          form.reset();
-        } else {
-          messageEl.style.color = 'red';
-          messageEl.textContent = data.message || 'Failed to send feedback.';
-        }
-      } catch (err) {
-        messageEl.style.color = 'red';
-        messageEl.textContent = 'Error connecting to server.';
-      }
-    });
-  </script>
+  <script src="../scripts/feedbackform.js"></script>
 
 </body>
 </html>
