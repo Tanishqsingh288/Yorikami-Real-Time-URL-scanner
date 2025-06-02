@@ -87,8 +87,6 @@ const getUserHistory = async (req, res) => {
   }
 };
 
-
-//Reset Password
 const resetPassword = async (req, res) => {
   const { newPassword, guardCode } = req.body;
 
@@ -113,13 +111,6 @@ const resetPassword = async (req, res) => {
     // Hash and save new password
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
-
-    // Send confirmation email
-    await transporter.sendMail({
-      to: user.email,
-      subject: 'Password Reset Successful - Yorikami',
-      text: 'Your password has been successfully reset. If this wasn’t you, please contact support immediately.'
-    });
 
     res.json({ message: 'Password reset successful' });
   } catch (error) {
