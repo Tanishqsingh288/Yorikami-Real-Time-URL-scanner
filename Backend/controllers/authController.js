@@ -30,7 +30,7 @@ const signupUser = async (req, res) => {
 
     await transporter.sendMail({
       to: email,
-      subject: 'Welcome to WebGuardX',
+      subject: 'Welcome to Yorikami',
       text: `Welcome! Your guard code is: ${guardCode}`
     });
 
@@ -61,8 +61,8 @@ const loginUser = async (req, res) => {
 
     await transporter.sendMail({
       to: email,
-      subject: 'Login Successful - WebGuardX',
-      text: 'You have successfully logged into your WebGuardX account.'
+      subject: 'Login Successful - Yorikami',
+      text: 'You have successfully logged into your Yorikami account.'
     });
 
     res.json({ token, sessionId });
@@ -132,7 +132,7 @@ const deleteUser = async (req, res) => {
     await transporter.sendMail({
       to: user.email,
       subject: 'Account Deleted',
-      text: 'Your WebGuardX account has been successfully deleted.'
+      text: 'Your Yorikami account has been successfully deleted.'
     });
 
     await User.deleteOne({ _id: user._id });
@@ -158,7 +158,7 @@ const logoutUser = async (req, res) => {
     await transporter.sendMail({
       to: user.email,
       subject: 'Logout Notification',
-      text: 'You have been successfully logged out from your WebGuardX account.'
+      text: 'You have been successfully logged out from your Yorikami account.'
     });
 
     res.json({ message: 'User logged out successfully' });
@@ -185,7 +185,7 @@ const updateEmail = async (req, res) => {
 
     await transporter.sendMail({
       to: newEmail,
-      subject: 'Email Updated - WebGuardX',
+      subject: 'Email Updated - Yorikami',
       text: `Your account email has been updated from ${oldEmail} to ${newEmail}. Your guard code remains the same.`
     });
 
