@@ -18,6 +18,7 @@ const NodeCache = require("node-cache");
 const scanCache = new NodeCache({ stdTTL: 0 }); // Cache TTL = Permanent
 
 async function handleSecurityCheck(req, res) {
+  
   const { url } = req.body;
   if (!url || typeof url !== "string") {
     return res.status(400).json({ error: "Invalid URL" });
