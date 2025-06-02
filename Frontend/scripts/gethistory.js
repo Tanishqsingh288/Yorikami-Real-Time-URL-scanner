@@ -35,6 +35,11 @@ document.addEventListener("DOMContentLoaded", () => {
               white-space: normal;
               line-height: 1.4;
               max-width: 400px;
+              color: blue;
+              text-decoration: underline;
+              cursor: default;
+              pointer-events: none;
+              user-select: text;
             "
           >
             ${item.url}
@@ -42,39 +47,51 @@ document.addEventListener("DOMContentLoaded", () => {
         </td>
         <td>${new Date(item.timestamp).toLocaleString()}</td>
         <td>
-          <button class="btn btn-sm btn-success reanalyze-btn" data-url="${item.url}">Re-analyse</button>
-          <button class="btn btn-sm btn-danger delete-btn" data-url="${item.url}">Delete</button>
+          <button class="btn btn-sm btn-success reanalyze-btn" data-url="${
+            item.url
+          }">Re-analyse</button>
+          <button class="btn btn-sm btn-danger delete-btn" data-url="${
+            item.url
+          }">Delete</button>
         </td>
-        <td><span class="badge bg-${getRatingColor(item.rating)}">${item.finalScore}/10 (${item.rating})</span></td>
+        <td><span class="badge bg-${getRatingColor(item.rating)}">${
+        item.finalScore
+      }/10 (${item.rating})</span></td>
       `;
       historyTableBody.appendChild(row);
     });
 
-    document.querySelectorAll(".reanalyze-btn").forEach(btn => {
+    document.querySelectorAll(".reanalyze-btn").forEach((btn) => {
       btn.addEventListener("click", () => reanalyze(btn.dataset.url));
     });
-    document.querySelectorAll(".delete-btn").forEach(btn => {
+    document.querySelectorAll(".delete-btn").forEach((btn) => {
       btn.addEventListener("click", () => deleteUrl(btn.dataset.url));
     });
   }
 
   function getRatingColor(rating) {
     switch (rating) {
-      case "SAFE": return "success";
-      case "RISKY": return "warning";
-      default: return "danger";
+      case "SAFE":
+        return "success";
+      case "RISKY":
+        return "warning";
+      default:
+        return "danger";
     }
   }
 
   async function fetchHistory() {
     try {
-      const res = await fetch("https://yorikamiscanner.duckdns.org/api/auth/history", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "x-session-id": sessionId
+      const res = await fetch(
+        "https://yorikamiscanner.duckdns.org/api/auth/history",
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "x-session-id": sessionId,
+          },
         }
-      });
+      );
 
       if (!res.ok) throw new Error("History fetch failed");
       const data = await res.json();
@@ -90,19 +107,22 @@ document.addEventListener("DOMContentLoaded", () => {
       "risk-desc": "history/risk/high-to-low",
       "risk-asc": "history/risk/low-to-high",
       "time-desc": "history/time/recent-first",
-      "time-asc": "history/time/oldest-first"
+      "time-asc": "history/time/oldest-first",
     };
 
     const route = routeMap[selected];
     if (!route) return;
 
     try {
-      const res = await fetch(`https://yorikamiscanner.duckdns.org/api/user/${route}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "x-session-id": sessionId
+      const res = await fetch(
+        `https://yorikamiscanner.duckdns.org/api/user/${route}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "x-session-id": sessionId,
+          },
         }
-      });
+      );
 
       const data = await res.json();
       if (Array.isArray(data.sortedHistory)) {
@@ -115,15 +135,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.reanalyze = async function (url) {
     try {
-      const res = await fetch("https://yorikamiscanner.duckdns.org/api/user/reanalyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          "x-session-id": sessionId
-        },
-        body: JSON.stringify({ url })
-      });
+      const res = await fetch(
+        "https://yorikamiscanner.duckdns.org/api/user/reanalyze",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            "x-session-id": sessionId,
+          },
+          body: JSON.stringify({ url }),
+        }
+      );
 
       if (res.ok) fetchHistory();
       else alert("Re-analysis failed");
@@ -134,15 +157,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.deleteUrl = async function (url) {
     try {
-      const res = await fetch("https://yorikamiscanner.duckdns.org/api/user/delete-url", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          "x-session-id": sessionId
-        },
-        body: JSON.stringify({ url })
-      });
+      const res = await fetch(
+        "https://yorikamiscanner.duckdns.org/api/user/delete-url",
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            "x-session-id": sessionId,
+          },
+          body: JSON.stringify({ url }),
+        }
+      );
 
       if (res.ok) fetchHistory();
       else alert("Delete failed");
@@ -170,15 +196,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       for (const item of deepUrls) {
-        const res = await fetch("https://yorikamiscanner.duckdns.org/api/check/analyze", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            "x-session-id": sessionId
-          },
-          body: JSON.stringify({ url: item.url })
-        });
+        const res = await fetch(
+          "https://yorikamiscanner.duckdns.org/api/check/analyze",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+              "x-session-id": sessionId,
+            },
+            body: JSON.stringify({ url: item.url }),
+          }
+        );
 
         if (res.ok) {
           console.log(`✅ Analysed: ${item.url}`);
