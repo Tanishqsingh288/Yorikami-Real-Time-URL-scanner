@@ -68,8 +68,8 @@ body.light-theme {
 }
 .logo {
   margin-left: 0px;
-  height: 70px;
-  width: 90px;
+  height: 40px;
+  width: auto;
   border-radius: 3px;
 }
 .header-title {
