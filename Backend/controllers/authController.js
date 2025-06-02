@@ -30,8 +30,17 @@ const signupUser = async (req, res) => {
 
     await transporter.sendMail({
       to: email,
-      subject: 'Welcome to Yorikami',
-      text: `Welcome! Your guard code is: ${guardCode}`
+      subject: 'Welcome to Yorikami - Your Account is Ready',
+      html: `
+        <h2>Welcome to Yorikami!</h2>
+        <p>We're excited to have you join our community.</p>
+        <p>Your unique <strong>Guard Code</strong> is: <strong>${guardCode}</strong></p>
+        <p>Please keep this code safe. It is required for secure actions like login, password reset, and account deletion.</p>
+        <br/>
+        <p>Enjoy exploring Yorikami!</p>
+        <hr/>
+        <p style="font-size:12px;color:#888;">Need help? Contact support@yorikami.com</p>
+      `
     });
 
     res.status(201).json({ message: 'Signup successful. Guard code has been sent to your email.' });
@@ -62,7 +71,13 @@ const loginUser = async (req, res) => {
     await transporter.sendMail({
       to: email,
       subject: 'Login Successful - Yorikami',
-      text: 'You have successfully logged into your Yorikami account.'
+      html: `
+        <h2>Login Notification</h2>
+        <p>You have successfully logged into your <strong>Yorikami</strong> account.</p>
+        <p>If this wasn't you, we recommend resetting your password immediately using your guard code.</p>
+        <br/>
+        <p>Stay safe,<br/>The Yorikami Team</p>
+      `
     });
 
     res.json({ token, sessionId });
@@ -111,6 +126,20 @@ const resetPassword = async (req, res) => {
     // Hash and save new password
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
+    await transporter.sendMail({
+      to: user.email,
+      subject: 'Your Yorikami Password Has Been Reset',
+      html: `
+        <h2>Hello from Yorikami</h2>
+        <p>We wanted to let you know that your password has been <strong>successfully updated</strong>.</p>
+        <p>If you did not request this change, please contact our support team immediately.</p>
+        <p><strong>Guard Code:</strong> ${guardCode}</p>
+        <br/>
+        <p>Thank you for staying secure with Yorikami.</p>
+        <hr/>
+        <p style="font-size:12px;color:#888;">This is an automated message. Please do not reply directly to this email.</p>
+      `
+    });
 
     res.json({ message: 'Password reset successful' });
   } catch (error) {
@@ -131,9 +160,18 @@ const deleteUser = async (req, res) => {
 
     await transporter.sendMail({
       to: user.email,
-      subject: 'Account Deleted',
-      text: 'Your Yorikami account has been successfully deleted.'
+      subject: 'Your Yorikami Account Has Been Deleted',
+      html: `
+        <h2>Account Deletion Confirmation</h2>
+        <p>We’re confirming that your Yorikami account has been permanently deleted.</p>
+        <p>If you did not request this, please reach out to us immediately.</p>
+        <br/>
+        <p>We’re sorry to see you go.</p>
+        <hr/>
+        <p style="font-size:12px;color:#888;">If this was a mistake, you may register again anytime at yorikami.com</p>
+      `
     });
+
 
     await User.deleteOne({ _id: user._id });
     res.json({ message: 'User deleted successfully' });
@@ -157,8 +195,14 @@ const logoutUser = async (req, res) => {
 
     await transporter.sendMail({
       to: user.email,
-      subject: 'Logout Notification',
-      text: 'You have been successfully logged out from your Yorikami account.'
+      subject: 'Logout Confirmation - Yorikami',
+      html: `
+        <h2>You Have Logged Out</h2>
+        <p>This is to confirm that you've successfully logged out of your Yorikami account.</p>
+        <p>If this wasn't you, we recommend checking your security settings.</p>
+        <br/>
+        <p>Thank you for using Yorikami.</p>
+      `
     });
 
     res.json({ message: 'User logged out successfully' });
@@ -185,8 +229,15 @@ const updateEmail = async (req, res) => {
 
     await transporter.sendMail({
       to: newEmail,
-      subject: 'Email Updated - Yorikami',
-      text: `Your account email has been updated from ${oldEmail} to ${newEmail}. Your guard code remains the same.`
+      subject: 'Email Address Updated - Yorikami',
+      html: `
+        <h2>Your Yorikami Email Has Been Updated</h2>
+        <p>Your account email was changed from <strong>${oldEmail}</strong> to <strong>${newEmail}</strong>.</p>
+        <p>Your <strong>Guard Code</strong> remains unchanged: <strong>${guardCode}</strong></p>
+        <p>If you didn’t make this change, please contact us immediately.</p>
+        <br/>
+        <p>Stay secure,<br/>The Yorikami Team</p>
+      `
     });
 
     res.json({ message: 'Email updated successfully' });
