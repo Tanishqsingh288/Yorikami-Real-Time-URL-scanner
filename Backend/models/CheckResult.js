@@ -6,7 +6,6 @@ function evaluateResults(checks) {
   // Define messages that indicate critical failures
   const criticalFailureMessages = [
     "flagged as unsafe",
-    "HTTPS is not enabled"
     //"Error checking third-party scripts"
   ];
 
