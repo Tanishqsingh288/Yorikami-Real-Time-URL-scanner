@@ -48,7 +48,7 @@
   `;
   popup.innerHTML = `
     <b>🔒 Yorikami Scan:</b><br>
-    Scanning ${uniqueLinks.length} links...
+    Scanning ${uniqueLinks.length} URLs...
     <div id="scan-time" style="font-size:12px;margin-top:5px;"></div>
     <ul id="result-list" style="padding-left: 20px; margin-top: 10px;"></ul>
     <button id="analyse-btn" style="margin-top: 10px; display:none; background:#00c9a7; color:white; border:none; padding:6px 10px; border-radius:5px; cursor:pointer;">Deep Analyse</button>
