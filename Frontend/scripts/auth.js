@@ -1,3 +1,4 @@
+// Existing constants
 const loginForm = document.getElementById("loginForm");
 const signupForm = document.getElementById("signupForm");
 const toggleText = document.getElementById("toggleText");
@@ -5,7 +6,7 @@ const formTitle = document.getElementById("formTitle");
 
 const BASE_URL = "https://yorikamiscanner.duckdns.org";
 
-// Attach click listener to toggle link inside toggleText
+// Attach toggle link
 function attachToggleListener() {
   const toggleLink = document.getElementById("toggleLink");
   if (toggleLink) {
@@ -16,18 +17,14 @@ function attachToggleListener() {
   }
 }
 
-// ✅ Check if already logged in on load
 window.addEventListener("DOMContentLoaded", () => {
-  // Check token from localStorage
   const token = localStorage.getItem("token");
   const sessionId = localStorage.getItem("sessionId");
 
   if (token && sessionId) {
-    // Redirect to dashboard if logged in
     window.location.href = "../webpages/dashboard.html";
   }
 
-  // Also check chrome.storage.local (optional)
   if (chrome?.storage?.local) {
     chrome.storage.local.get(["token", "sessionId"], (items) => {
       if (items.token && items.sessionId) {
@@ -36,8 +33,17 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Attach listener for toggle link on initial load
   attachToggleListener();
+
+  // Attach checkbox control logic
+  const agreementCheckbox = document.getElementById("signupAgreement");
+  const signupBtn = document.getElementById("signupBtn");
+
+  if (agreementCheckbox && signupBtn) {
+    agreementCheckbox.addEventListener("change", () => {
+      signupBtn.disabled = !agreementCheckbox.checked;
+    });
+  }
 });
 
 function toggleForms() {
@@ -52,14 +58,24 @@ function toggleForms() {
     loginForm.classList.add("d-none");
     signupForm.classList.remove("d-none");
     toggleText.innerHTML = `Already have an account? <a href="#" id="toggleLink">Login</a>`;
-    formTitle.innerText = "Create your WebGuardX Account";
+    formTitle.innerText = "Create your YoriKami Account";
   }
 
-  // Re-bind event listener after innerHTML change
   attachToggleListener();
+
+  // Refresh checkbox logic
+  const agreementCheckbox = document.getElementById("signupAgreement");
+  const signupBtn = document.getElementById("signupBtn");
+
+  if (agreementCheckbox && signupBtn) {
+    signupBtn.disabled = !agreementCheckbox.checked;
+    agreementCheckbox.addEventListener("change", () => {
+      signupBtn.disabled = !agreementCheckbox.checked;
+    });
+  }
 }
 
-// ✅ Signup
+// Signup handler
 signupForm.addEventListener("submit", async function (e) {
   e.preventDefault();
 
@@ -86,7 +102,7 @@ signupForm.addEventListener("submit", async function (e) {
     }
 
     if (res.ok) {
-      alert("✅ Signup successful! Check email for your guard code.");
+      alert("✅ Signup successful! Please check your email for your unique Guard Code. Keep it secure and never share it.");
       toggleForms();
     } else {
       alert(data.error || "❌ Signup failed");
@@ -95,6 +111,9 @@ signupForm.addEventListener("submit", async function (e) {
     alert("❌ Signup error: " + err.message);
   }
 });
+
+// Login handler remains unchanged...
+
 
 // ✅ Login
 loginForm.addEventListener("submit", async function (e) {
