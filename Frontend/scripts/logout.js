@@ -17,13 +17,48 @@ document.getElementById("logoutForm").addEventListener("submit", async function 
     });
 
     const data = await res.json();
-    document.getElementById("message").innerText = data.message || data.error;
+    
+    // Show popup message
+    const popup = document.createElement('div');
+    popup.style = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #111;
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      z-index: 9999;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      font-family: Arial, sans-serif;
+    `;
+    popup.textContent = "You are logged out";
+    document.body.appendChild(popup);
 
     if (res.ok) {
+      // Clear localStorage
       localStorage.clear();
-      setTimeout(() => window.location.href = "../auth/auth.html", 2000);
+      
+      // Clear chrome.storage.local if available
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.remove(['token', 'sessionId'], () => {
+          console.log('Removed from chrome.storage.local');
+        });
+      }
+      
+      // Close window after 3 seconds
+      setTimeout(() => {
+        window.location.href = "../auth/auth.html";
+        // If you want to close the tab/window completely instead of redirecting:
+        // window.close();
+      }, 3000);
+    } else {
+      document.getElementById("message").innerText = data.error || "Logout failed";
+      setTimeout(() => popup.remove(), 3000);
     }
   } catch (err) {
-    document.getElementById("message").innerText = "Logout failed.";
+    document.getElementById("message").innerText = "Logout failed. Please try again.";
+    console.error("Logout error:", err);
   }
 });
