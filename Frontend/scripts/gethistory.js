@@ -101,8 +101,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  sortDropdown.addEventListener("change", async (e) => {
-    const selected = e.target.value;
+  // Replace the sortDropdown event listener with this:
+document.getElementById('sortDropdownMenu').addEventListener('click', async (e) => {
+  if (e.target.classList.contains('dropdown-item')) {
+    const selected = e.target.dataset.value;
     const routeMap = {
       "risk-desc": "history/risk/high-to-low",
       "risk-asc": "history/risk/low-to-high",
@@ -131,8 +133,8 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (err) {
       console.error("Sorting failed:", err.message);
     }
-  });
-
+  }
+});
   window.reanalyze = async function (url) {
     try {
       const res = await fetch(

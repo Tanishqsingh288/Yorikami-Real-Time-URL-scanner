@@ -1,117 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Dashboard</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="../bootstrap-5.0.2-dist/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="../styling/dashboard.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>User Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="../bootstrap-5.0.2-dist/css/bootstrap.min.css" />
-  <link rel="stylesheet" href="../styling/dashboard.css" />
-</head>
+  <body class="light-theme">
+    <!-- Background Shapes -->
+    <div class="bg-shapes">
+      <div class="shape-1"></div>
+      <div class="shape-2"></div>
+      <div class="shape-3"></div>
+      <div class="shape-4"></div>
+    </div>
 
-<body class="light-theme">
-  <!-- Background Shapes -->
-  <div class="bg-shapes">
-    <div class="shape-1"></div>
-    <div class="shape-2"></div>
-    <div class="shape-3"></div>
-    <div class="shape-4"></div>
-  </div>
-
-  <!-- Main Content Wrapper -->
-  <div class="main-content">
-    <!-- Header -->
-    <header class="dashboard-header">
-      <div class="container d-flex justify-content-between align-items-center">
-        <div class="logo-container">
-          <img src="../graphical assests/logo.png" alt="Logo" class="logo" />
+    <!-- Main Content Wrapper -->
+    <div class="main-content">
+      <!-- Header -->
+      <header class="dashboard-header">
+        <div
+          class="container d-flex justify-content-between align-items-center"
+        >
+          <div class="logo-container">
+            <img src="../graphical assests/logo.png" alt="Logo" class="logo" />
+          </div>
+          <h1 class="header-title">User Panel</h1>
+          <button id="themeToggle" class="theme-toggle btn"></button>
         </div>
-        <h1 class="header-title">User Panel</h1>
-        <button id="themeToggle" class="theme-toggle btn">
-          
-        </button>
-      </div>
-    </header>
+      </header>
 
-    <!-- Controls Section -->
-    <section class="container controls-section">
-      <div class="glass-card control-card p-3">
-        <select class="form-select bg-transparent border-0" id="sortDropdown">
-          <option selected disabled>Sort Orders</option>
-          <option value="time-asc">Time Asc</option>
-          <option value="time-desc">Time Desc</option>
-          <option value="risk-asc">Risk Asc</option>
-          <option value="risk-desc">Risk Desc</option>
-        </select>
-      </div>
+      <!-- Controls Section -->
+      <section class="container controls-section">
+        <!-- Replace the existing select dropdown with this -->
+        <div class="dropdown">
+          <button
+            class="glass-card control-card btn dropdown-toggle d-flex align-items-center"
+            type="button"
+            id="sortDropdownBtn"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i class="fas fa-sort me-2"></i>
+            <span>Sort Orders</span>
+          </button>
+          <ul class="dropdown-menu glass-dropdown" id="sortDropdownMenu">
+            <li>
+              <a class="dropdown-item" href="#" data-value="time-asc"
+                >Time Asc</a
+              >
+            </li>
+            <li>
+              <a class="dropdown-item" href="#" data-value="time-desc"
+                >Time Desc</a
+              >
+            </li>
+            <li>
+              <a class="dropdown-item" href="#" data-value="risk-asc"
+                >Risk Asc</a
+              >
+            </li>
+            <li>
+              <a class="dropdown-item" href="#" data-value="risk-desc"
+                >Risk Desc</a
+              >
+            </li>
+          </ul>
+        </div>
 
-      <div class="dropdown">
-        <button class="glass-card control-card btn dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="fas fa-user-cog me-2"></i>
-          <span>Manage Profile</span>
-        </button>
-        <ul class="dropdown-menu glass-dropdown">
-          <li><a class="dropdown-item" href="./uppass.html"><i class="fas fa-key me-2"></i>Update Password</a></li>
-          <li><a class="dropdown-item" href="./upemail.html"><i class="fas fa-envelope me-2"></i>Update Email</a></li>
-          <li><a class="dropdown-item" href="./deregister.html"><i class="fas fa-user-slash me-2"></i>Deregister Account</a></li>
-          <li><hr class="dropdown-divider" /></li>
-          <li><a class="dropdown-item text-danger" href="./logout.html"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-        </ul>
-      </div>
+        <div class="dropdown">
+          <button
+            class="glass-card control-card btn dropdown-toggle d-flex align-items-center"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i class="fas fa-user-cog me-2"></i>
+            <span>Manage Profile</span>
+          </button>
+          <ul class="dropdown-menu glass-dropdown">
+            <li>
+              <a class="dropdown-item" href="./uppass.html"
+                ><i class="fas fa-key me-2"></i>Update Password</a
+              >
+            </li>
+            <li>
+              <a class="dropdown-item" href="./upemail.html"
+                ><i class="fas fa-envelope me-2"></i>Update Email</a
+              >
+            </li>
+            <li>
+              <a class="dropdown-item" href="./deregister.html"
+                ><i class="fas fa-user-slash me-2"></i>Deregister Account</a
+              >
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+              <a class="dropdown-item text-danger" href="./logout.html"
+                ><i class="fas fa-sign-out-alt me-2"></i>Logout</a
+              >
+            </li>
+          </ul>
+        </div>
 
-      <a href="./feedbackform.html" class="glass-card control-card btn btn-warning d-flex align-items-center" role="button">
-        <i class="fas fa-comment-alt me-2"></i>
-        <span>Send Feedback</span>
-      </a>
-      
-      <a href="./portfolio.html" class="glass-card control-card btn btn-info d-flex align-items-center" role="button">
-        <i class="fas fa-code me-2"></i>
-        <span>About Developer</span>
-      </a>
-    </section>
+        <a
+          href="./feedbackform.html"
+          class="glass-card control-card btn btn-warning d-flex align-items-center"
+          role="button"
+        >
+          <i class="fas fa-comment-alt me-2"></i>
+          <span>Send Feedback</span>
+        </a>
 
-    <!-- URL Interaction Table -->
-    <div class="container table-container glass-card">
-      <div class="table-responsive">
-        <table class="table table-hover align-middle">
-          <thead class="table-header">
-            <tr>
-              <th class="ps-4">S.No</th>
-              <th>URL</th>
-              <th>Timestamp</th>
-              <th>Actions</th>
-              <th class="pe-4">Rating</th>
-            </tr>
-          </thead>
-          <tbody id="historyTableBody">
-            <!-- Sample rows - will be dynamically populated -->
-            
-          </tbody>
-        </table>
+        <a
+          href="./portfolio.html"
+          class="glass-card control-card btn btn-info d-flex align-items-center"
+          role="button"
+        >
+          <i class="fas fa-code me-2"></i>
+          <span>About Developer</span>
+        </a>
+      </section>
+
+      <!-- URL Interaction Table -->
+      <div class="container table-container glass-card">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-header">
+              <tr>
+                <th class="ps-4">S.No</th>
+                <th>URL</th>
+                <th>Timestamp</th>
+                <th>Actions</th>
+                <th class="pe-4">Rating</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody">
+              <!-- Sample rows - will be dynamically populated -->
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-wave"></div>
-    <div class="footer-content container">
-      <p class="mb-0">
-        Connect with Developer:
-        <a href="https://www.instagram.com/tanishqsingh6.9/" class="text-light mx-2"><i class="fab fa-instagram"></i></a>
-        <a href="https://github.com/Tanishqsingh288" class="text-light mx-2"><i class="fab fa-github"></i></a>
-        <a href="https://www.linkedin.com/in/tanishq-singh-3249b135b/" class="text-light mx-2"><i class="fab fa-linkedin"></i></a>
-      </p>
-    </div>
-  </footer>
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-wave"></div>
+      <div class="footer-content container">
+        <p class="mb-0">
+          Connect with Developer:
+          <a
+            href="https://www.instagram.com/tanishqsingh6.9/"
+            class="text-light mx-2"
+            ><i class="fab fa-instagram"></i
+          ></a>
+          <a href="https://github.com/Tanishqsingh288" class="text-light mx-2"
+            ><i class="fab fa-github"></i
+          ></a>
+          <a
+            href="https://www.linkedin.com/in/tanishq-singh-3249b135b/"
+            class="text-light mx-2"
+            ><i class="fab fa-linkedin"></i
+          ></a>
+        </p>
+      </div>
+    </footer>
 
-
-  <script src="../bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../scripts/dashanimation.js"></script>
-   <script src="../scripts/dashboard-analysis.js"></script>
-  <script src="../scripts/gethistory.js"></script>
-</body>
-
+    <script src="../bootstrap-5.0.2-dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../scripts/dashanimation.js"></script>
+    <script src="../scripts/dashboard-analysis.js"></script>
+    <script src="../scripts/gethistory.js"></script>
+  </body>
 </html>
