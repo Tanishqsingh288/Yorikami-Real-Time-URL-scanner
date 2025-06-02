@@ -46,6 +46,11 @@ window.addEventListener("DOMContentLoaded", () => {
     analyseStatus.style.background = "#a4f9c8";
     analyseStatus.style.color = "#0a0";
 
+    // Remove the status message after 3 seconds
+    setTimeout(() => {
+      analyseStatus.remove();
+    }, 3000);
+
     chrome.storage.local.remove("deepUrls", () => {
       console.log("🧹 Removed deepUrls from storage after analysis.");
     });
