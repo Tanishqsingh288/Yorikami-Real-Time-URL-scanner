@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
             item.url
           }">Delete</button>
         </td>
-        <td><span class="badge bg-${getRatingColor(item.rating)}">${
+        <td><span class="badge bg-${getRatingColor(item.rating)}"style="color: rgb(255, 255, 255);">${
         item.finalScore
       }/10 (${item.rating})</span></td>
       `;
