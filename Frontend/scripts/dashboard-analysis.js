@@ -32,7 +32,7 @@ window.addEventListener("DOMContentLoaded", () => {
             Authorization: `Bearer ${token}`,
             "x-session-id": sessionId,
           },
-          body: JSON.stringify({ url }),
+          body: JSON.stringify(url),
         });
 
         if (!res.ok) {
