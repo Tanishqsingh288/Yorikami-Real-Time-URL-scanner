@@ -1,52 +1,103 @@
+/* === Global Reset & Font === */
 body {
   font-family: 'Poppins', sans-serif;
-  background: linear-gradient(to right, #1f1f2e, #2c3e50);
-  color: #fff;
+  background: radial-gradient(circle at center, #0582ff, #001f3f 80%);
+
+  color: #e6f0ff; /* soft light blue text */
   min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  overflow: hidden;
+  animation: fadeIn 1s ease-in;
 }
 
+/* === Fade In Page Animation === */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === Auth Box Container === */
 .auth-box {
-  background-color: #292c36;
+  background-color: #00264d; /* solid navy */
   padding: 40px;
-  border-radius: 12px;
+  border-radius: 8px;
   width: 100%;
   max-width: 450px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+  border: 2px solid #007bff; /* classic blue border */
+  animation: slideUp 0.6s ease-out;
 }
 
+/* === Auth Box Entry Animation === */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === Header Title === */
 .auth-box h2 {
   text-align: center;
-  margin-bottom: 20px;
-  color: #00c9a7;
+  margin-bottom: 25px;
+  color: #007bff;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-shadow: 1px 1px 3px #004080;
 }
 
+/* === Input Fields === */
 .form-control {
-  background-color: #1d1f27;
-  border: 1px solid #444;
-  color: #fff;
+  background-color: #003366;
+  border: 1.5px solid #0059b3;
+  color: #cce6ff;
+  padding: 12px 15px;
+  border-radius: 4px;
+  margin-bottom: 18px;
+  transition: border-color 0.3s ease;
 }
 
 .form-control:focus {
-  border-color: #00c9a7;
-  box-shadow: none;
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 8px #007bff88;
+  background-color: #004080;
 }
 
+/* === Submit Button === */
 .btn-primary {
-  background-color: #00c9a7;
+  background-color: #007bff;
   border: none;
+  padding: 12px 20px;
+  width: 100%;
+  color: #e6f0ff;
+  font-weight: 700;
+  border-radius: 4px;
+  box-shadow: 0 0 10px #005bb5;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
 .btn-primary:hover {
-  background-color: #00b498;
+  background-color: #0056b3;
+  box-shadow: 0 0 14px #004080;
 }
 
+/* === Tab Toggle Section === */
 .tab-toggle {
   text-align: center;
   margin-top: 15px;
 }
 
 .tab-toggle a {
-  color: #00c9a7;
+  color: #007bff;
   cursor: pointer;
   text-decoration: underline;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.tab-toggle a:hover {
+  color: #3399ff;
 }
