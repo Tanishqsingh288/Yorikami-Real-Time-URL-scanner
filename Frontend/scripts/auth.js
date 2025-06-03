@@ -136,9 +136,11 @@ loginForm.addEventListener("submit", async function (e) {
       // Store in both localStorage and chrome.storage.local
       localStorage.setItem("token", data.token);
       localStorage.setItem("sessionId", data.sessionId);
+      localStorage.setItem("userEmail", email);
       console.log("📦 Saved to localStorage:", {
         token: localStorage.getItem("token"),
         sessionId: localStorage.getItem("sessionId"),
+        userEmail: email,
       });
 
       if (chrome?.storage?.local) {

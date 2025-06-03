@@ -304,3 +304,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+window.addEventListener("DOMContentLoaded", () => {
+        const email = localStorage.getItem("userEmail");
+        if (email) {
+          const emailElement = document.getElementById("loggedInAs");
+          if (emailElement) {
+            emailElement.textContent = `Logged in as: ${email}`;
+          }
+        } else if (chrome?.storage?.local) {
+          chrome.storage.local.get(["userEmail"], (result) => {
+            if (result.userEmail) {
+              const emailElement = document.getElementById("loggedInAs");
+              if (emailElement) {
+                emailElement.textContent = `Logged in as: ${result.userEmail}`;
+              }
+            }
+          });
+        }
+      });
