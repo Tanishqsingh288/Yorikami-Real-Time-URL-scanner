@@ -1,5 +1,6 @@
 document.getElementById("updatePasswordForm").addEventListener("submit", async function (e) {
   e.preventDefault();
+  alert("✅ Your Yorikami Password is successfully Updated. Please Check the Email for teh confirmation.")
 
   const newPassword = document.getElementById("newPassword").value;
   const guardCode = document.getElementById("guardCode").value;

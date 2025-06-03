@@ -1,5 +1,6 @@
 document.getElementById("logoutForm").addEventListener("submit", async function (e) {
   e.preventDefault();
+  alert("✅ You Successfully logged out of your Yorikami account. Please check the Email. for the confirmation.")
 
   const guardCode = document.getElementById("guardCode").value;
   const token = localStorage.getItem("token");

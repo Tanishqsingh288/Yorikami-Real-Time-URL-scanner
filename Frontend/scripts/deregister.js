@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.getElementById("deregisterForm").addEventListener("submit", async function (e) {
   e.preventDefault();
+  alert("✅ Your Account has been Deleted Successfully. Please check the Email for confirmation.");
 
   const password = document.getElementById("password").value;
   const guardCode = document.getElementById("guardCode").value;

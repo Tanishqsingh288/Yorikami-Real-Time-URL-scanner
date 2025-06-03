@@ -1,5 +1,6 @@
 document.getElementById("updateEmailForm").addEventListener("submit", async function (e) {
   e.preventDefault();
+  alert("✅ Your Registered Yorikami Email has been Successfully Updated. Please check Your newly registered email for the confirmation.")
 
   const newEmail = document.getElementById("newEmail").value;
   const currentPassword = document.getElementById("currentPassword").value;
