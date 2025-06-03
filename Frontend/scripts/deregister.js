@@ -1,3 +1,12 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const checkbox = document.getElementById("confirmDelete");
+  const deleteBtn = document.getElementById("deleteBtn");
+
+  checkbox.addEventListener("change", () => {
+    deleteBtn.disabled = !checkbox.checked;
+  });
+});
+
 document.getElementById("deregisterForm").addEventListener("submit", async function (e) {
   e.preventDefault();
 

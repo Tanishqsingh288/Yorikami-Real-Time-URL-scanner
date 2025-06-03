@@ -105,3 +105,6 @@ body {
   color: #ffffff;
   opacity: 1; /* make sure it's fully opaque */
 }
+.form-check{
+  color: #cce6ff;
+}
