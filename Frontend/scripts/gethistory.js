@@ -80,41 +80,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  async function fetchHistory() {
-    try {
-      const res = await fetch(
-        "https://yorikamiscanner.duckdns.org/api/auth/history",
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "x-session-id": sessionId,
-          },
-        }
-      );
-
-      if (!res.ok) throw new Error("History fetch failed");
-      const data = await res.json();
-      if (Array.isArray(data.history)) renderTable(data.history);
-    } catch (err) {
-      console.error("Error fetching history:", err.message);
-    }
-  }
-
-  // Replace the sortDropdown event listener with this:
-document.getElementById('sortDropdownMenu').addEventListener('click', async (e) => {
-  if (e.target.classList.contains('dropdown-item')) {
-    const selected = e.target.dataset.value;
-    const routeMap = {
-      "risk-desc": "history/risk/high-to-low",
-      "risk-asc": "history/risk/low-to-high",
-      "time-desc": "history/time/recent-first",
-      "time-asc": "history/time/oldest-first",
-    };
-
-    const route = routeMap[selected];
-    if (!route) return;
-
+  // New function to fetch sorted history with route param
+  async function fetchSortedHistory(route = "history/time/recent-first") {
     try {
       const res = await fetch(
         `https://yorikamiscanner.duckdns.org/api/user/${route}`,
@@ -126,102 +93,141 @@ document.getElementById('sortDropdownMenu').addEventListener('click', async (e) 
         }
       );
 
+      if (!res.ok) throw new Error("History fetch failed");
       const data = await res.json();
+
       if (Array.isArray(data.sortedHistory)) {
         renderTable(data.sortedHistory);
+      } else if (Array.isArray(data.history)) {
+        renderTable(data.history);
       }
     } catch (err) {
-      console.error("Sorting failed:", err.message);
+      console.error("Error fetching history:", err.message);
     }
   }
-});
-  window.reanalyze = async function (url) {
-  try {
-    const res = await fetch(
-      "https://yorikamiscanner.duckdns.org/api/user/reanalyze",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          "x-session-id": sessionId,
-        },
-        body: JSON.stringify({ url }),
-      }
-    );
 
-    if (res.ok) {
-      // Add the URL to deepUrls in chrome.storage.local
-      chrome.storage.local.get(["deepUrls"], (result) => {
-        const deepUrls = Array.isArray(result.deepUrls) ? result.deepUrls : [];
-        if (!deepUrls.includes(url)) {
-          deepUrls.push(url);
-          chrome.storage.local.set({ deepUrls }, () => {
-            // Trigger the deep analysis popup & processing (copied from your existing code)
-            startDeepAnalysis(deepUrls);
-          });
-        } else {
-          // If already in deepUrls, just start analysis
-          startDeepAnalysis(deepUrls);
-        }
-      });
+  // Replace the sortDropdown event listener with this:
+  document.getElementById("sortDropdownMenu").addEventListener("click", async (e) => {
+    if (e.target.classList.contains("dropdown-item")) {
+      const selected = e.target.dataset.value;
+      const routeMap = {
+        "risk-desc": "history/risk/high-to-low",
+        "risk-asc": "history/risk/low-to-high",
+        "time-desc": "history/time/recent-first",
+        "time-asc": "history/time/oldest-first",
+      };
 
-      fetchHistory(); // update the table too
-    } else {
-      alert("Re-analysis failed");
-    }
-  } catch (err) {
-    console.error("Re-analysis error:", err.message);
-  }
-};
-function startDeepAnalysis(deepUrls) {
-  const analysingPopup = document.createElement("div");
-  analysingPopup.style = `
-    position: fixed; bottom: 20px; right: 20px;
-    background: #111; color: #fff; padding: 15px;
-    border-radius: 8px; z-index: 9999; font-family: Arial;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
-  `;
-  analysingPopup.textContent = "⏳ Analysing unsafe URLs...";
-  document.body.appendChild(analysingPopup);
+      const route = routeMap[selected];
+      if (!route) return;
 
-  (async () => {
-    try {
-      for (const url of deepUrls) {
+      try {
         const res = await fetch(
-          "https://yorikamiscanner.duckdns.org/api/check/analyze",
+          `https://yorikamiscanner.duckdns.org/api/user/${route}`,
           {
-            method: "POST",
             headers: {
-              "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
               "x-session-id": sessionId,
             },
-            body: JSON.stringify({ url }),
           }
         );
 
-        if (res.ok) {
-          console.log(`✅ Analysed: ${url}`);
-        } else {
-          console.warn(`⚠️ Failed to analyse ${url}`);
+        const data = await res.json();
+        if (Array.isArray(data.sortedHistory)) {
+          renderTable(data.sortedHistory);
         }
+      } catch (err) {
+        console.error("Sorting failed:", err.message);
       }
-
-      analysingPopup.textContent = "✅ Deep analysis complete! Refreshing...";
-      setTimeout(() => {
-        analysingPopup.remove();
-        chrome.storage.local.remove("deepUrls");
-        fetchHistory();
-      }, 1500);
-    } catch (err) {
-      console.error("❌ Deep analysis failed:", err.message);
-      analysingPopup.textContent = "❌ Analysis failed.";
-      setTimeout(() => analysingPopup.remove(), 2000);
     }
-  })();
-}
+  });
 
+  window.reanalyze = async function (url) {
+    try {
+      const res = await fetch(
+        "https://yorikamiscanner.duckdns.org/api/user/reanalyze",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            "x-session-id": sessionId,
+          },
+          body: JSON.stringify({ url }),
+        }
+      );
+
+      if (res.ok) {
+        // Add the URL to deepUrls in chrome.storage.local
+        chrome.storage.local.get(["deepUrls"], (result) => {
+          const deepUrls = Array.isArray(result.deepUrls) ? result.deepUrls : [];
+          if (!deepUrls.includes(url)) {
+            deepUrls.push(url);
+            chrome.storage.local.set({ deepUrls }, () => {
+              // Trigger the deep analysis popup & processing (copied from your existing code)
+              startDeepAnalysis(deepUrls);
+            });
+          } else {
+            // If already in deepUrls, just start analysis
+            startDeepAnalysis(deepUrls);
+          }
+        });
+
+        fetchSortedHistory(); // update the table with default sorting
+      } else {
+        alert("Re-analysis failed");
+      }
+    } catch (err) {
+      console.error("Re-analysis error:", err.message);
+    }
+  };
+
+  function startDeepAnalysis(deepUrls) {
+    const analysingPopup = document.createElement("div");
+    analysingPopup.style = `
+      position: fixed; bottom: 20px; right: 20px;
+      background: #111; color: #fff; padding: 15px;
+      border-radius: 8px; z-index: 9999; font-family: Arial;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    `;
+    analysingPopup.textContent = "⏳ Analysing unsafe URLs...";
+    document.body.appendChild(analysingPopup);
+
+    (async () => {
+      try {
+        for (const url of deepUrls) {
+          const res = await fetch(
+            "https://yorikamiscanner.duckdns.org/api/check/analyze",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+                "x-session-id": sessionId,
+              },
+              body: JSON.stringify({ url }),
+            }
+          );
+
+          if (res.ok) {
+            console.log(`✅ Analysed: ${url}`);
+          } else {
+            console.warn(`⚠️ Failed to analyse ${url}`);
+          }
+        }
+
+        analysingPopup.textContent = "✅ Deep analysis complete! Refreshing...";
+        setTimeout(() => {
+          analysingPopup.remove();
+          chrome.storage.local.remove("deepUrls");
+          fetchSortedHistory();
+        }, 1500);
+      } catch (err) {
+        console.error("❌ Deep analysis failed:", err.message);
+        analysingPopup.textContent = "❌ Analysis failed.";
+        setTimeout(() => analysingPopup.remove(), 2000);
+      }
+    })();
+  }
 
   window.deleteUrl = async function (url) {
     try {
@@ -238,14 +244,15 @@ function startDeepAnalysis(deepUrls) {
         }
       );
 
-      if (res.ok) fetchHistory();
+      if (res.ok) fetchSortedHistory();
       else alert("Delete failed");
     } catch (err) {
       console.error("Delete error:", err.message);
     }
   };
 
-  fetchHistory();
+  // Load default sorted history by recent first on page load
+  fetchSortedHistory();
 
   chrome.storage?.local?.get(["deepUrls"], async (result) => {
     const deepUrls = result.deepUrls;
@@ -288,7 +295,7 @@ function startDeepAnalysis(deepUrls) {
       setTimeout(() => {
         analysingPopup.remove();
         chrome.storage.local.remove("deepUrls");
-        fetchHistory();
+        fetchSortedHistory();
       }, 1500);
     } catch (err) {
       console.error("❌ Deep analysis failed:", err.message);
