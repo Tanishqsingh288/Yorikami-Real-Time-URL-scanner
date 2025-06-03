@@ -1,15 +1,51 @@
 body {
   font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at center, #0582ff, #001f3f 80%);
+  color: #e6f0ff; /* soft light blue text */
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  overflow: hidden;
+  animation: fadeIn 1s ease-in forwards;
 }
 
 .auth-box {
-  background-color: #9a9a9a;
+  background-color: #00264d; /* navy from blue theme */
   border-radius: 15px;
   max-width: 400px;
-  animation: slideIn 0.5s ease-in-out;
+  padding: 30px 25px;
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+  border: 2px solid #007bff; /* classic blue border */
+  animation: slideIn 0.6s ease-in-out forwards;
+  color: #cce6ff; /* lighter text */
 }
 
 @keyframes slideIn {
-  from { transform: translateY(50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Optional: style placeholder color to white for inputs inside auth-box */
+.auth-box input::placeholder {
+  color: #00000099; /* white with some transparency */
 }
