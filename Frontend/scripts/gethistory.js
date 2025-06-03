@@ -136,26 +136,92 @@ document.getElementById('sortDropdownMenu').addEventListener('click', async (e) 
   }
 });
   window.reanalyze = async function (url) {
-    try {
-      const res = await fetch(
-        "https://yorikamiscanner.duckdns.org/api/user/reanalyze",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            "x-session-id": sessionId,
-          },
-          body: JSON.stringify({ url }),
-        }
-      );
+  try {
+    const res = await fetch(
+      "https://yorikamiscanner.duckdns.org/api/user/reanalyze",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          "x-session-id": sessionId,
+        },
+        body: JSON.stringify({ url }),
+      }
+    );
 
-      if (res.ok) fetchHistory();
-      else alert("Re-analysis failed");
-    } catch (err) {
-      console.error("Re-analysis error:", err.message);
+    if (res.ok) {
+      // Add the URL to deepUrls in chrome.storage.local
+      chrome.storage.local.get(["deepUrls"], (result) => {
+        const deepUrls = Array.isArray(result.deepUrls) ? result.deepUrls : [];
+        if (!deepUrls.includes(url)) {
+          deepUrls.push(url);
+          chrome.storage.local.set({ deepUrls }, () => {
+            // Trigger the deep analysis popup & processing (copied from your existing code)
+            startDeepAnalysis(deepUrls);
+          });
+        } else {
+          // If already in deepUrls, just start analysis
+          startDeepAnalysis(deepUrls);
+        }
+      });
+
+      fetchHistory(); // update the table too
+    } else {
+      alert("Re-analysis failed");
     }
-  };
+  } catch (err) {
+    console.error("Re-analysis error:", err.message);
+  }
+};
+function startDeepAnalysis(deepUrls) {
+  const analysingPopup = document.createElement("div");
+  analysingPopup.style = `
+    position: fixed; bottom: 20px; right: 20px;
+    background: #111; color: #fff; padding: 15px;
+    border-radius: 8px; z-index: 9999; font-family: Arial;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  `;
+  analysingPopup.textContent = "⏳ Analysing unsafe URLs...";
+  document.body.appendChild(analysingPopup);
+
+  (async () => {
+    try {
+      for (const url of deepUrls) {
+        const res = await fetch(
+          "https://yorikamiscanner.duckdns.org/api/check/analyze",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+              "x-session-id": sessionId,
+            },
+            body: JSON.stringify({ url }),
+          }
+        );
+
+        if (res.ok) {
+          console.log(`✅ Analysed: ${url}`);
+        } else {
+          console.warn(`⚠️ Failed to analyse ${url}`);
+        }
+      }
+
+      analysingPopup.textContent = "✅ Deep analysis complete! Refreshing...";
+      setTimeout(() => {
+        analysingPopup.remove();
+        chrome.storage.local.remove("deepUrls");
+        fetchHistory();
+      }, 1500);
+    } catch (err) {
+      console.error("❌ Deep analysis failed:", err.message);
+      analysingPopup.textContent = "❌ Analysis failed.";
+      setTimeout(() => analysingPopup.remove(), 2000);
+    }
+  })();
+}
+
 
   window.deleteUrl = async function (url) {
     try {

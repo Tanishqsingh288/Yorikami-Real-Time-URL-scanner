@@ -1,6 +1,6 @@
 window.addEventListener("DOMContentLoaded", () => {
-  chrome.storage.local.get(["token", "sessionId", "deepUrls"], async (data) => {
-    const { token, sessionId, deepUrls } = data;
+  chrome.storage.local.get(["token", "sessionId", "deepUrls", "reanalyzeTriggered"], async (data) => {
+    const { token, sessionId, deepUrls, reanalyzeTriggered } = data;
 
     if (!deepUrls || !Array.isArray(deepUrls) || deepUrls.length === 0) {
       console.warn("⚠️ No deepUrls to process.");
@@ -9,7 +9,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const analyseStatus = document.createElement("div");
     analyseStatus.id = "analysis-status";
-    analyseStatus.innerText = "⏳ Analysing unsafe URLs...";
+    analyseStatus.innerText = reanalyzeTriggered
+      ? "🔄 Re-analysing the URLs..."
+      : "⏳ Analysing unsafe URLs...";
     analyseStatus.style = `
       margin: 10px; 
       padding: 8px; 
@@ -20,7 +22,6 @@ window.addEventListener("DOMContentLoaded", () => {
     `;
     document.body.prepend(analyseStatus);
 
-    // Use Promise.all to wait for all fetches (mapping to an array of promises)
     const analyzePromises = deepUrls.map(async (url) => {
       try {
         console.log(`📡 Sending analysis request for: ${url}`);
@@ -48,24 +49,20 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Wait for all analysis to finish
     const results = await Promise.all(analyzePromises);
 
     console.log("🔍 Analysis results:", results);
 
-    // Update UI to say complete
     analyseStatus.innerText = "✅ Deep analysis complete!";
     analyseStatus.style.background = "#a4f9c8";
     analyseStatus.style.color = "#0a0";
 
-    // Remove the message after 3 seconds
     setTimeout(() => {
       analyseStatus.remove();
     }, 3000);
 
-    // Clear deepUrls from storage
-    chrome.storage.local.remove("deepUrls", () => {
-      console.log("🧹 Removed deepUrls from storage after analysis.");
+    chrome.storage.local.remove(["deepUrls", "reanalyzeTriggered"], () => {
+      console.log("🧹 Removed deepUrls and reanalyze flag from storage after analysis.");
     });
   });
 });
