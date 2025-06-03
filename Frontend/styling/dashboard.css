@@ -224,3 +224,8 @@ html, body {
   border: 2px solid #d1eaff;
 }
 
+#loggedInAs {
+  font-size: 0.9rem;
+  color: #000e67;
+  font-weight: 500;
+}
