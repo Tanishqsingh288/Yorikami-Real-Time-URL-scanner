@@ -78,6 +78,7 @@ function toggleForms() {
 // Signup handler
 signupForm.addEventListener("submit", async function (e) {
   e.preventDefault();
+  alert("🔐 Signing up... Please wait.");
 
   const email = document.getElementById("signupEmail").value;
   const password = document.getElementById("signupPassword").value;
@@ -118,6 +119,7 @@ signupForm.addEventListener("submit", async function (e) {
 // ✅ Login
 loginForm.addEventListener("submit", async function (e) {
   e.preventDefault();
+  alert("🔐 Logging you in... Please wait.");
 
   const email = document.getElementById("loginEmail").value;
   const password = document.getElementById("loginPassword").value;
