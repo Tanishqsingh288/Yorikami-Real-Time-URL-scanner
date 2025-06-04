@@ -131,9 +131,6 @@
 
   try {
     await Promise.allSettled(
-      
-
-
       uniqueLinks.map(async ({ rawHref, url, title }) => {
         // Check for insecure HTTP URLs
         if (rawHref.startsWith("http://")) {
@@ -144,8 +141,8 @@
           return;
         }
         unsafeUrls.forEach(({ url }) => {
-  highlightUnsafeLink(url);
-});
+          highlightUnsafeLink(url);
+        });
 
         // Check for protocol-relative URLs on HTTP pages
         if (rawHref.startsWith("//") && window.location.protocol === "http:") {
@@ -245,6 +242,50 @@
     resultList.innerHTML = `<li style="color:lightgreen;">✅ No unsafe or insecure URLs found</li>`;
   } else {
     analyseBtn.style.display = "inline-block";
+    // Add "Go to Dashboard" button
+    const dashboardBtn = document.createElement("button");
+    dashboardBtn.textContent = "Go to Dashboard";
+    dashboardBtn.style.cssText = `
+  margin-top: 10px;
+  margin-left: 10px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+`;
+
+    // If analyse button is shown, insert beside it
+    if (analyseBtn.style.display === "inline-block") {
+      analyseBtn.parentNode.insertBefore(dashboardBtn, analyseBtn.nextSibling);
+    } else {
+      // If not, show the dashboard button alone
+      resultList.insertAdjacentElement("afterend", dashboardBtn);
+    }
+
+    // Handle dashboard redirection
+    dashboardBtn.addEventListener("click", async () => {
+      try {
+        const { token, sessionId } = await chrome.storage.local.get([
+          "token",
+          "sessionId",
+        ]);
+
+        if (!token || !sessionId) {
+          analyseStatus.innerText = "Redirecting to login...";
+          setTimeout(() => {
+            window.location.href = chrome.runtime.getURL("webpages/auth.html");
+          }, 1500);
+          return;
+        }
+
+        window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
+      } catch (error) {
+        console.error("❌ Failed to navigate to dashboard:", error);
+        analyseStatus.innerText = "❌ Error: " + error.message;
+      }
+    });
   }
 
   // Handle deep analysis button click
