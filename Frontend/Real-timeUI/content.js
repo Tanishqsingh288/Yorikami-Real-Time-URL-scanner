@@ -241,55 +241,52 @@
   }
 
   // Update UI based on results
-  if (unsafeUrls.length === 0 && !serverErrorOccurred) {
-    resultList.innerHTML = `<li style="color:lightgreen;">✅ No unsafe or insecure URLs found</li>`;
-  } else {
-    analyseBtn.style.display = "inline-block";
-    // Add "Go to Dashboard" button
-const dashboardBtn = document.createElement("button");
-dashboardBtn.textContent = "Go to Dashboard";
-dashboardBtn.style.cssText = `
-  margin-top: 10px;
-  background: #4caf50;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-`;
+  // Update UI based on results
+if (unsafeUrls.length === 0 && !serverErrorOccurred) {
+  resultList.innerHTML = `<li style="color:lightgreen;">✅ No unsafe or insecure URLs found</li>`;
 
-// Add it beside the Analyse button if it's visible
-if (analyseBtn.style.display === "inline-block") {
-  analyseBtn.parentNode.insertBefore(dashboardBtn, analyseBtn.nextSibling);
-} else {
-  // Add it where analyse button would be if not shown
-  analyseBtn.parentNode.insertBefore(dashboardBtn, analyseBtn);
-}
+  // Hide analyseBtn and show Go to Dashboard button
+  analyseBtn.style.display = "none";
 
-// Handle dashboard redirection
-dashboardBtn.addEventListener("click", async () => {
-  try {
-    const { token, sessionId } = await chrome.storage.local.get([
-      "token",
-      "sessionId",
-    ]);
+  // Create Go to Dashboard button
+  const goToDashBtn = document.createElement("button");
+  goToDashBtn.textContent = "Go to Dashboard";
+  goToDashBtn.style.cssText = `
+    margin-top: 10px; 
+    background: #008CBA; 
+    color: white; 
+    border: none; 
+    padding: 6px 10px; 
+    border-radius: 5px; 
+    cursor: pointer;
+    font-size: 14px;
+  `;
 
-    if (!token || !sessionId) {
-      analyseStatus.innerText = "Redirecting to login...";
-      setTimeout(() => {
+  popup.appendChild(goToDashBtn);
+
+  goToDashBtn.addEventListener("click", async () => {
+    goToDashBtn.disabled = true;
+    try {
+      const { token, sessionId } = await chrome.storage.local.get([
+        "token",
+        "sessionId",
+      ]);
+
+      if (token && sessionId) {
+        // Logged in, redirect to dashboard
+        window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
+      } else {
+        // Not logged in, redirect to auth
         window.location.href = chrome.runtime.getURL("webpages/auth.html");
-      }, 1500);
-      return;
+      }
+    } catch (err) {
+      console.error("Error checking login status:", err);
+      goToDashBtn.disabled = false;
     }
-
-    window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
-  } catch (error) {
-    console.error("❌ Failed to navigate to dashboard:", error);
-    analyseStatus.innerText = "❌ Error: " + error.message;
-  }
-});
-
-  }
+  });
+} else {
+  analyseBtn.style.display = "inline-block";
+}
 
   // Handle deep analysis button click
   analyseBtn?.addEventListener("click", async () => {
