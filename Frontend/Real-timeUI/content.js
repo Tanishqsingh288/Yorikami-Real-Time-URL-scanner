@@ -30,7 +30,7 @@
       max-width: 300px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     `;
-    errorDiv.textContent = "⚠️ Server is down. Please try again later.";
+    errorDiv.textContent = "⚠️ Yorikami Server is Down. Please try again later.";
 
     document.body.appendChild(errorDiv);
 
@@ -131,9 +131,6 @@
 
   try {
     await Promise.allSettled(
-      
-
-
       uniqueLinks.map(async ({ rawHref, url, title }) => {
         // Check for insecure HTTP URLs
         if (rawHref.startsWith("http://")) {
@@ -143,9 +140,11 @@
           unsafeUrls.push({ url, title });
           return;
         }
+
+        // Highlight unsafe links early for HTTP
         unsafeUrls.forEach(({ url }) => {
-  highlightUnsafeLink(url);
-});
+          highlightUnsafeLink(url);
+        });
 
         // Check for protocol-relative URLs on HTTP pages
         if (rawHref.startsWith("//") && window.location.protocol === "http:") {
@@ -183,11 +182,10 @@
           if (data.unsafeUrls && data.unsafeUrls.includes(url)) {
             const li = document.createElement("li");
 
-            // Wrap only the title part in bright yellow color (fixed)
             li.innerHTML = `
-    🚨 <strong style="color: red;">Insecure:</strong> 
-    <span style="color: #ffcc00; font-weight: bold;">${title}</span>
-  `;
+              🚨 <strong style="color: red;">Insecure:</strong> 
+              <span style="color: #ffcc00; font-weight: bold;">${title}</span>
+            `;
 
             resultList.appendChild(li);
             unsafeUrls.push({ url, title });
@@ -196,14 +194,26 @@
           }
         } catch (err) {
           console.error(`❌ Failed to check ${url}`, err);
-          if (
-            !serverErrorOccurred &&
-            (err.message.includes("Failed to fetch") ||
-              err.message.includes("NetworkError") ||
-              err.name === "AbortError")
-          ) {
-            serverErrorOccurred = true;
-            showServerError();
+
+          if (!serverErrorOccurred) {
+            const msg = err.message || "";
+            const name = err.name || "";
+
+            const serverDownErrors = [
+              "net::ERR_FAILED",
+              "net::ERR_CONNECTION_REFUSED",
+              "net::ERR_NAME_NOT_RESOLVED",
+              "Failed to load resource: net::ERR_FAILED",
+              "Failed to fetch"
+            ];
+
+            const isServerDownError = serverDownErrors.some((errStr) => msg.includes(errStr));
+
+            if (isServerDownError) {
+              serverErrorOccurred = true;
+              showServerError();
+              return;
+            }
           }
         }
       })
@@ -241,52 +251,50 @@
   }
 
   // Update UI based on results
-  // Update UI based on results
-if (unsafeUrls.length === 0 && !serverErrorOccurred) {
-  resultList.innerHTML = `<li style="color:lightgreen;">✅ No unsafe or insecure URLs found</li>`;
+  if (unsafeUrls.length === 0 && !serverErrorOccurred) {
+    resultList.innerHTML = `<li style="color:lightgreen;">✅ No unsafe or insecure URLs found</li>`;
 
-  // Hide analyseBtn and show Go to Dashboard button
-  analyseBtn.style.display = "none";
+    analyseBtn.style.display = "none";
 
-  // Create Go to Dashboard button
-  const goToDashBtn = document.createElement("button");
-  goToDashBtn.textContent = "Go to Dashboard";
-  goToDashBtn.style.cssText = `
-    margin-top: 10px; 
-    background: #008CBA; 
-    color: white; 
-    border: none; 
-    padding: 6px 10px; 
-    border-radius: 5px; 
-    cursor: pointer;
-    font-size: 14px;
-  `;
+    // Create Go to Dashboard button
+    const goToDashBtn = document.createElement("button");
+    goToDashBtn.textContent = "Go to Dashboard";
+    goToDashBtn.style.cssText = `
+      margin-top: 10px; 
+      background: #008CBA; 
+      color: white; 
+      border: none; 
+      padding: 6px 10px; 
+      border-radius: 5px; 
+      cursor: pointer;
+      font-size: 14px;
+    `;
 
-  popup.appendChild(goToDashBtn);
+    popup.appendChild(goToDashBtn);
 
-  goToDashBtn.addEventListener("click", async () => {
-    goToDashBtn.disabled = true;
-    try {
-      const { token, sessionId } = await chrome.storage.local.get([
-        "token",
-        "sessionId",
-      ]);
+    goToDashBtn.addEventListener("click", async () => {
+      goToDashBtn.disabled = true;
+      try {
+        const { token, sessionId } = await chrome.storage.local.get([
+          "token",
+          "sessionId",
+        ]);
 
-      if (token && sessionId) {
-        // Logged in, redirect to dashboard
-        window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
-      } else {
-        // Not logged in, redirect to auth
-        window.location.href = chrome.runtime.getURL("webpages/auth.html");
+        if (token && sessionId) {
+          // Logged in, redirect to dashboard
+          window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
+        } else {
+          // Not logged in, redirect to auth
+          window.location.href = chrome.runtime.getURL("webpages/auth.html");
+        }
+      } catch (err) {
+        console.error("Error checking login status:", err);
+        goToDashBtn.disabled = false;
       }
-    } catch (err) {
-      console.error("Error checking login status:", err);
-      goToDashBtn.disabled = false;
-    }
-  });
-} else {
-  analyseBtn.style.display = "inline-block";
-}
+    });
+  } else {
+    analyseBtn.style.display = "inline-block";
+  }
 
   // Handle deep analysis button click
   analyseBtn?.addEventListener("click", async () => {
@@ -324,6 +332,7 @@ if (unsafeUrls.length === 0 && !serverErrorOccurred) {
     }
   });
 })();
+
 function highlightUnsafeLink(unsafeUrl) {
   const anchors = document.querySelectorAll("a");
 
