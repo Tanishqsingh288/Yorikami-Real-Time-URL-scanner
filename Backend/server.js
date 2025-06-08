@@ -9,6 +9,7 @@ const linkScanRoutes = require('./routes/linkscan');
 const connectDB = require('./config/db');
 const { submitFeedback } = require('./feedback/feedbackcontroller');
 
+
 dotenv.config();
 const app = express();
 
@@ -23,6 +24,8 @@ app.use('/api/auth', authRoutes); // Authentication Route
 app.use('/api/links', linkScanRoutes); // Quick scan Route
 app.use('/api/user', userRoutes); // User Interaction and Dashboard Route
 app.use('/api/feedback', submitFeedback);
+app.use("/api/payment", require("./routes/payment"));
+
 
 app.get('/', (req, res) => {
   res.send('🌐 WebGuardX Server is running!');

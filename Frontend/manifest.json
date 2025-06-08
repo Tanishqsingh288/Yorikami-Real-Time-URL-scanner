@@ -9,7 +9,8 @@
     "webNavigation"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "<all_urls>",
+    "https://yorikamiscanner.duckdns.org/*"
   ],
   "action": {
     "default_popup": "Real-timeUI/ui.html",
