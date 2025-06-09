@@ -24,7 +24,7 @@ app.use('/api/auth', authRoutes); // Authentication Route
 app.use('/api/links', linkScanRoutes); // Quick scan Route
 app.use('/api/user', userRoutes); // User Interaction and Dashboard Route
 app.use('/api/feedback', submitFeedback);
-app.use("/api/payment", require("./routes/payment"));
+
 
 
 app.get('/', (req, res) => {
