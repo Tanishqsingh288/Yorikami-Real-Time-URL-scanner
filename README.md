@@ -1,30 +1,30 @@
 
-# 🔒 YorikamiV1 — Real-time Malicious Link Scanner Chrome Extension
+# 🔒 Yorikami — Real-time Malicious URL Scanner Chrome Extension
 
 ![Yorikami Banner](./Frontend/graphical-assests/logo.png)
 
 **Yorikami** is a real-time browser security extension that scans every page you visit for malicious, insecure, or suspicious links. It flags potentially harmful URLs and visually highlights them on the page to warn users — without blocking their browsing experience.
 
 ---
-## 🛡️ Why Use YorikamiV1?
+## 🛡️ Why Use Yorikami?
 
 **Yorikami** is not just a browser extension — it’s your personal online safety companion. As cyber threats continue to rise, protecting yourself from phishing links, fake websites, and malicious redirects is no longer optional. WebGuardX equips users with real-time link scanning, deep risk analysis, and visibility into the dangers hiding in plain sight.
 
 ---
 
-### 🔥 Top 5 Reasons to Use YorikamiV1
+### 🔥 Top 5 Reasons to Use Yorikami
 
 ---
 
 ### 1️⃣ Real-Time Link Scanning on Every Webpage  
-Every time you visit a webpage, YorikamiV1 scans all outgoing links and identifies potentially unsafe or insecure URLs. This happens automatically — no button presses, no delays.
+Every time you visit a webpage, Yorikami scans all outgoing links and identifies potentially unsafe or insecure URLs. This happens automatically — no button presses, no delays.
 
 > ✅ Immediate protection before you even click.
 
 ---
 
 ### 2️⃣ Risk Labeling + Highlighted Titles  
-YorikamiV1 doesn’t just list unsafe links — it finds their associated titles and highlights them directly on the webpage. Now, you know exactly what to avoid with bold visual cues.
+Yorikami doesn’t just list unsafe links — it finds their associated titles and highlights them directly on the webpage. Now, you know exactly what to avoid with bold visual cues.
 
 > 🟡 Suspicious links are clearly marked and highlighted for your attention.
 
@@ -59,7 +59,7 @@ After login, users gain access to a dedicated dashboard to:
 ---
 
 ### 5️⃣ Built for Privacy, Always Free  
-YorikamiV1:
+Yorikami:
 - ❌ Does NOT track you  
 - ❌ Does NOT sell your data  
 - ❌ Does NOT require payment  
@@ -82,7 +82,7 @@ YorikamiV1:
 
 ---
 
-### ✅ YorikamiV1 helps you browse smarter, safer, and with full awareness.  
+### ✅ Yorikami helps you browse smarter, safer, and with full awareness.  
 Start using it today. Stay informed, not infected.
 
 
@@ -91,7 +91,7 @@ Start using it today. Stay informed, not infected.
 
 ## 🧭 How It Works
 
-1. 🔍 As soon as you visit any website (e.g., news sites, blogs, shopping, etc.), **YorikamiV1 automatically scans all the links** present on that page.
+1. 🔍 As soon as you visit any website (e.g., news sites, blogs, shopping, etc.), **Yorikami automatically scans all the links** present on that page.
 2. 🚨 It flags suspicious, insecure, or dangerous URLs and shows them in a floating scanner panel.
 3. 🟡 Unsafe links are also **highlighted directly in the webpage content** using their visible anchor text or titles — so you know exactly what to avoid.
 4. 👨‍💻 You remain in control — the extension **warns**, but does **not block** access to any link.
@@ -214,7 +214,7 @@ If you wish to use or contribute to this project, please contact the author dire
 
 ---
 
-> YorikamiV1 is a **non-invasive**, **privacy-friendly**, and **defensive utility** built to empower the modern internet user — because **you deserve to browse safely**.
+> Yorikami is a **non-invasive**, **privacy-friendly**, and **defensive utility** built to empower the modern internet user — because **you deserve to browse safely**.
 
 
 
