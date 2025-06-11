@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Yorikami",
+  "name": "YorikamiV1",
   "version": "1.0",
   "description": "Yorikami is a free Chrome extension that protects users while browsing by scanning web pages in real time for harmful or suspicious links. It highlights threats clearly, helps users avoid scams, and offers a private dashboard to track risks — all without tracking your data or slowing you down.",
   "permissions": [
