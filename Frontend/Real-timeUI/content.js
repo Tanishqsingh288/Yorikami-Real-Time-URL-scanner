@@ -349,6 +349,15 @@ function highlightUnsafeLink(unsafeUrl) {
   });
 
   function highlightChildren(element) {
+
+    function playNotificationSound() {
+  const audio = new Audio(chrome.runtime.getURL("graphical-assets/soft_notification.mp3"));
+  audio.volume = 0.6; // Optional: adjust volume
+  audio.play().catch((err) => {
+    console.error("Audio playback failed:", err);
+  });
+}
+
     const children = element.children;
     if (children.length === 0) {
       // Leaf node
@@ -365,4 +374,5 @@ function highlightUnsafeLink(unsafeUrl) {
       highlightChildren(child); // Recurse
     }
   }
+  
 }

@@ -42,7 +42,8 @@
         "webpages/*.html",
         "styling/*.css",
         "scripts/*.js",
-        "graphical-assets/*.png"
+        "graphical-assests/*.png",
+        "graphical-assests/*.mp3"
       ],
       "matches": ["<all_urls>"]
     }
