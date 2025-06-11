@@ -194,6 +194,7 @@ This tool was built by Tanishq Singh, a full-stack developer passionate about cy
 
 - 💼 [LinkedIn](https://www.linkedin.com/in/tanishq-singh-3249b135b/)
 - 🐙 [GitHub](https://github.com/Tanishqsingh288)
+- 𝐈𝐧𝐬𝐭𝐚𝐠𝐫𝐚𝐦🅾 [Instagram] (https://www.instagram.com/tanishqsingh6.9/)
 
 ---
 
@@ -422,6 +423,7 @@ Yorikami/
 
 - 💼 [LinkedIn](https://www.linkedin.com/in/tanishq-singh-3249b135b/)  
 - 🐙 [GitHub](https://github.com/Tanishqsingh288)
+- 𝐈𝐧𝐬𝐭𝐚𝐠𝐫𝐚𝐦🅾 [Instagram] (https://www.instagram.com/tanishqsingh6.9/)
 
 ---
 
