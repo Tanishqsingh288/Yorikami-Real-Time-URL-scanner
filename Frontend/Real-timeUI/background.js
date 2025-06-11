@@ -17,3 +17,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // Keeps the message channel open for async response
   }
 });
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === "CHECK_HTTP_REDIRECT" && typeof message.url === "string") {
+    console.log("🔁 [BG] Received CHECK_HTTP_REDIRECT for:", message.url);
+    fetch(message.url, { method: "HEAD", redirect: "manual" })
+      .then((response) => {
+        const location = response.headers.get("Location");
+        const redirectsToHttps = location?.startsWith("https://") || false;
+        console.log("🔁 [BG] HEAD response location:", location);
+        sendResponse({ redirectsToHttps });
+      })
+      .catch((err) => {
+        console.error("🔁 [BG] Fetch HEAD failed for", message.url, err);
+        sendResponse({ redirectsToHttps: false });
+      });
+    return true; // Keep channel open
+  }
+});
+

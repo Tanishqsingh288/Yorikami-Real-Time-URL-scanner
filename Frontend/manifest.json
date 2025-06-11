@@ -6,7 +6,13 @@
   "permissions": [
     "activeTab",
     "storage",
-    "webNavigation"
+    "webNavigation",
+    "tabs",
+    "webRequest",
+    "storage",
+    "scripting",
+    "http://*/*",
+    "https://*/*"
   ],
   "host_permissions": [
     "<all_urls>",
