@@ -8,7 +8,7 @@
 ---
 ## 🛡️ Why Use Yorikami?
 
-**Yorikami** is not just a browser extension — it’s your personal online safety companion. As cyber threats continue to rise, protecting yourself from phishing links, fake websites, and malicious redirects is no longer optional. WebGuardX equips users with real-time link scanning, deep risk analysis, and visibility into the dangers hiding in plain sight.
+**Yorikami** is not just a browser extension — it’s your personal online safety companion. As cyber threats continue to rise, protecting yourself from phishing links, fake websites, and malicious redirects is no longer optional. **Yorikami** equips users with real-time link scanning, deep risk analysis, and visibility into the dangers hiding in plain sight.
 
 ---
 
