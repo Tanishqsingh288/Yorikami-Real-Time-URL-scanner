@@ -1,7 +1,7 @@
 
 # 🔒 Yorikami — Real-time Malicious Link Scanner Chrome Extension
 
-![Yorikami Banner](./graphicalAssets/logo.png)
+![Yorikami Banner](./graphical-assests/logo.png)
 
 **Yorikami** is a real-time browser security extension that scans every page you visit for malicious, insecure, or suspicious links. It flags potentially harmful URLs and visually highlights them on the page to warn users — without blocking their browsing experience.
 
