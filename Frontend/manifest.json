@@ -36,7 +36,7 @@
         "webpages/*.html",
         "styling/*.css",
         "scripts/*.js",
-        "graphical assets/soft_notification.mp3"
+        "graphical assets/*.png"
       ],
       "matches": ["<all_urls>"]
     }
