@@ -15,9 +15,9 @@
   "action": {
     "default_popup": "Real-timeUI/ui.html",
     "default_icon": {
-      "16": "./graphical-assests/displaylogo.png",
-      "48": "./graphical-assests/displaylogo.png",
-      "128": "./graphical-assests/displaylogo.png"
+      "16": "./graphical-assets/displaylogo.png",
+      "48": "./graphical-assets/displaylogo.png",
+      "128": "./graphical-assets/displaylogo.png"
     }
   },
   "background": {
