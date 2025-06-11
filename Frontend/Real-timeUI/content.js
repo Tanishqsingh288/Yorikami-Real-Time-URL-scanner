@@ -337,29 +337,32 @@ function highlightUnsafeLink(unsafeUrl) {
 
   anchors.forEach((anchor) => {
     if (anchor.href.trim() === unsafeUrl.trim()) {
-      anchor.dataset.originalColor = anchor.style.color; // Save current color
+      anchor.dataset.originalColor = anchor.style.color;
       anchor.style.color = "#FFD700"; // Bright yellow
-      anchor.style.backgroundColor = "#2b2b2b"; // Optional dark background
+      anchor.style.backgroundColor = "#2b2b2b";
       anchor.style.fontWeight = "bold";
       anchor.title = "⚠️ This link was flagged as unsafe by Yorikami Scanner";
 
-      // Highlight specific inner text content like "Diljit Dosanjh To Make Debut At Met ..."
-      const matchingTextNodes = Array.from(anchor.childNodes).filter(
-        (node) =>
-          node.nodeType === Node.TEXT_NODE &&
-          node.nodeValue.trim().length > 0
-      );
-
-      matchingTextNodes.forEach((textNode) => {
-        const span = document.createElement("span");
-        span.style.backgroundColor = "#4b4b00"; // Dark yellow highlight
-        span.style.padding = "2px 4px";
-        span.style.borderRadius = "3px";
-        span.style.color = "#FFD700";
-        span.style.fontWeight = "bold";
-        span.textContent = textNode.nodeValue;
-        anchor.replaceChild(span, textNode);
-      });
+      // Apply highlight recursively to all inner elements
+      highlightChildren(anchor);
     }
   });
+
+  function highlightChildren(element) {
+    const children = element.children;
+    if (children.length === 0) {
+      // Leaf node
+      //element.style.backgroundColor = "#000000";
+      element.style.color = "#fff200";
+      element.style.fontWeight = "bold";
+      return;
+    }
+
+    for (let child of children) {
+      //child.style.backgroundColor = "#000000";
+      child.style.color = "#fff200";
+      child.style.fontWeight = "bold";
+      highlightChildren(child); // Recurse
+    }
+  }
 }
