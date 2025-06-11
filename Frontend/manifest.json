@@ -15,11 +15,17 @@
   "action": {
     "default_popup": "Real-timeUI/ui.html",
     "default_icon": {
-      "16": "./graphical-assests/displaylogo.png",
-      "48": "./graphical-assests/displaylogo.png",
-      "128": "./graphical-assests/displaylogo.png"
+      "16": "graphical-assests/displaylogo.png",
+      "48": "graphical-assests/displaylogo.png",
+      "128": "graphical-assests/displaylogo.png"
     }
   },
+  "icons": {
+  "16": "graphical-assests/displaylogo.png",
+  "48": "graphical-assests/displaylogo.png",
+  "128": "graphical-assests/displaylogo.png"
+}
+,
   "background": {
     "service_worker": "Real-timeUI/background.js"
   },
