@@ -36,7 +36,7 @@
         "webpages/*.html",
         "styling/*.css",
         "scripts/*.js",
-        "graphical assets/*.png"
+        "graphical-assets/*.png"
       ],
       "matches": ["<all_urls>"]
     }
