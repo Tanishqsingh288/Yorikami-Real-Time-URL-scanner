@@ -38,6 +38,21 @@
       errorDiv.remove();
     }, 5000);
   }
+  function checkHttpRedirect(url) {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage(
+      { type: "CHECK_HTTP_REDIRECT", url },
+      (response) => {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else {
+          resolve(response);
+        }
+      }
+    );
+  });
+}
+
 
   // Function to validate URLs
   function isValidUrl(url) {
@@ -134,12 +149,39 @@
       uniqueLinks.map(async ({ rawHref, url, title }) => {
         // Check for insecure HTTP URLs
         if (rawHref.startsWith("http://")) {
-          const li = document.createElement("li");
-          li.innerHTML = `<span style="color: #ffcc00; font-weight: bold;">${title}</span>`;
-          resultList.appendChild(li);
-          unsafeUrls.push({ url, title });
-          return;
-        }
+  try {
+    const response = await checkHttpRedirect(url);
+    console.log("🔁 Checked redirect for", url, "Result:", response);
+
+    if (response?.redirectsToHttps === false) {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        🚨 <strong style="color: red;"></strong> 
+        <span style="color: #ffcc00; font-weight: bold;">${title}</span>
+      `;
+      resultList.appendChild(li);
+      unsafeUrls.push({ url, title });
+      highlightUnsafeLink(url);
+    } else {
+      // Safe — don't show or push anything
+      cache.set(url, "safe");
+    }
+  } catch (err) {
+    console.warn("⚠️ Could not verify HTTP redirect for:", url, err);
+    // Only fallback to unsafe if truly needed
+    const li = document.createElement("li");
+    li.innerHTML = `
+      ⚠️ <strong style="color: orange;">Unverified:</strong> 
+      <span style="color: #ffcc00; font-weight: bold;">${title}</span>
+    `;
+    resultList.appendChild(li);
+    unsafeUrls.push({ url, title });
+    highlightUnsafeLink(url);
+  }
+
+  return; // Ensure each URL is only handled once
+}
+
 
         // Highlight unsafe links early for HTTP
         unsafeUrls.forEach(({ url }) => {

@@ -20,18 +20,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "CHECK_HTTP_REDIRECT" && typeof message.url === "string") {
     console.log("🔁 [BG] Received CHECK_HTTP_REDIRECT for:", message.url);
-    fetch(message.url, { method: "HEAD", redirect: "manual" })
+
+    fetch(message.url, { method: "GET", redirect: "follow" })
       .then((response) => {
-        const location = response.headers.get("Location");
-        const redirectsToHttps = location?.startsWith("https://") || false;
-        console.log("🔁 [BG] HEAD response location:", location);
+        const finalUrl = response.url;
+        const redirectsToHttps = finalUrl.startsWith("https://");
+        console.log("🔁 [BG] Final resolved URL:", finalUrl);
         sendResponse({ redirectsToHttps });
       })
       .catch((err) => {
-        console.error("🔁 [BG] Fetch HEAD failed for", message.url, err);
+        console.error("🔁 [BG] Fetch failed:", err);
         sendResponse({ redirectsToHttps: false });
       });
-    return true; // Keep channel open
+
+    return true; // Keep message channel open
   }
 });
-
