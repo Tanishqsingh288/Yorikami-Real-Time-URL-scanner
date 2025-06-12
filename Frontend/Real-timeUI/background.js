@@ -1,11 +1,14 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "SYNC_AUTH") {
-    chrome.storage.local.set({
-      token: message.token,
-      sessionId: message.sessionId
-    }, () => {
-      console.log("✅ Synced auth to chrome.storage.local from web");
-    });
+    chrome.storage.local.set(
+      {
+        token: message.token,
+        sessionId: message.sessionId,
+      },
+      () => {
+        console.log("✅ Synced auth to chrome.storage.local from web");
+      }
+    );
   }
 });
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -18,7 +21,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "CHECK_HTTP_REDIRECT" && typeof message.url === "string") {
+  if (
+    message.type === "CHECK_HTTP_REDIRECT" &&
+    typeof message.url === "string"
+  ) {
     console.log("🔁 [BG] Received CHECK_HTTP_REDIRECT for:", message.url);
 
     fetch(message.url, { method: "GET", redirect: "follow" })

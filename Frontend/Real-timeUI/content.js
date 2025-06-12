@@ -30,7 +30,8 @@
       max-width: 300px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     `;
-    errorDiv.textContent = "⚠️ Yorikami Server is Down. Please try again later.";
+    errorDiv.textContent =
+      "⚠️ Yorikami Server is Down. Please try again later.";
 
     document.body.appendChild(errorDiv);
 
@@ -39,20 +40,19 @@
     }, 5000);
   }
   function checkHttpRedirect(url) {
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(
-      { type: "CHECK_HTTP_REDIRECT", url },
-      (response) => {
-        if (chrome.runtime.lastError) {
-          reject(chrome.runtime.lastError);
-        } else {
-          resolve(response);
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage(
+        { type: "CHECK_HTTP_REDIRECT", url },
+        (response) => {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+          } else {
+            resolve(response);
+          }
         }
-      }
-    );
-  });
-}
-
+      );
+    });
+  }
 
   // Function to validate URLs
   function isValidUrl(url) {
@@ -149,39 +149,38 @@
       uniqueLinks.map(async ({ rawHref, url, title }) => {
         // Check for insecure HTTP URLs
         if (rawHref.startsWith("http://")) {
-  try {
-    const response = await checkHttpRedirect(url);
-    console.log("🔁 Checked redirect for", url, "Result:", response);
+          try {
+            const response = await checkHttpRedirect(url);
+            console.log("🔁 Checked redirect for", url, "Result:", response);
 
-    if (response?.redirectsToHttps === false) {
-      const li = document.createElement("li");
-      li.innerHTML = `
+            if (response?.redirectsToHttps === false) {
+              const li = document.createElement("li");
+              li.innerHTML = `
         🚨 <strong style="color: red;"></strong> 
         <span style="color: #ffcc00; font-weight: bold;">${title}</span>
       `;
-      resultList.appendChild(li);
-      unsafeUrls.push({ url, title });
-      highlightUnsafeLink(url);
-    } else {
-      // Safe — don't show or push anything
-      cache.set(url, "safe");
-    }
-  } catch (err) {
-    console.warn("⚠️ Could not verify HTTP redirect for:", url, err);
-    // Only fallback to unsafe if truly needed
-    const li = document.createElement("li");
-    li.innerHTML = `
+              resultList.appendChild(li);
+              unsafeUrls.push({ url, title });
+              highlightUnsafeLink(url);
+            } else {
+              // Safe — don't show or push anything
+              cache.set(url, "safe");
+            }
+          } catch (err) {
+            console.warn("⚠️ Could not verify HTTP redirect for:", url, err);
+            // Only fallback to unsafe if truly needed
+            const li = document.createElement("li");
+            li.innerHTML = `
       ⚠️ <strong style="color: orange;">Unverified:</strong> 
       <span style="color: #ffcc00; font-weight: bold;">${title}</span>
     `;
-    resultList.appendChild(li);
-    unsafeUrls.push({ url, title });
-    highlightUnsafeLink(url);
-  }
+            resultList.appendChild(li);
+            unsafeUrls.push({ url, title });
+            highlightUnsafeLink(url);
+          }
 
-  return; // Ensure each URL is only handled once
-}
-
+          return; // Ensure each URL is only handled once
+        }
 
         // Highlight unsafe links early for HTTP
         unsafeUrls.forEach(({ url }) => {
@@ -246,10 +245,12 @@
               "net::ERR_CONNECTION_REFUSED",
               "net::ERR_NAME_NOT_RESOLVED",
               "Failed to load resource: net::ERR_FAILED",
-              "Failed to fetch"
+              "Failed to fetch",
             ];
 
-            const isServerDownError = serverDownErrors.some((errStr) => msg.includes(errStr));
+            const isServerDownError = serverDownErrors.some((errStr) =>
+              msg.includes(errStr)
+            );
 
             if (isServerDownError) {
               serverErrorOccurred = true;
@@ -324,7 +325,9 @@
 
         if (token && sessionId) {
           // Logged in, redirect to dashboard
-          window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
+          window.location.href = chrome.runtime.getURL(
+            "webpages/dashboard.html"
+          );
         } else {
           // Not logged in, redirect to auth
           window.location.href = chrome.runtime.getURL("webpages/auth.html");
@@ -391,14 +394,15 @@ function highlightUnsafeLink(unsafeUrl) {
   });
 
   function highlightChildren(element) {
-
     function playNotificationSound() {
-  const audio = new Audio(chrome.runtime.getURL("graphical-assets/soft_notification.mp3"));
-  audio.volume = 0.6; // Optional: adjust volume
-  audio.play().catch((err) => {
-    console.error("Audio playback failed:", err);
-  });
-}
+      const audio = new Audio(
+        chrome.runtime.getURL("graphical-assets/soft_notification.mp3")
+      );
+      audio.volume = 0.6; // Optional: adjust volume
+      audio.play().catch((err) => {
+        console.error("Audio playback failed:", err);
+      });
+    }
 
     const children = element.children;
     if (children.length === 0) {
@@ -416,5 +420,4 @@ function highlightUnsafeLink(unsafeUrl) {
       highlightChildren(child); // Recurse
     }
   }
-  
 }
