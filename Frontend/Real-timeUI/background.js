@@ -42,3 +42,47 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // Keep message channel open
   }
 });
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === "AUTH_FETCH") {
+    chrome.storage.local.get(["token"], async (items) => {
+      const token = items.token;
+
+      if (!token) {
+        sendResponse({ success: false, error: "No token found" });
+        return;
+      }
+
+      try {
+        const res = await fetch(message.url, {
+          method: message.method || "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+            ...(message.headers || {})
+          },
+          body: message.body ? JSON.stringify(message.body) : undefined,
+        });
+
+        const contentType = res.headers.get("content-type");
+        const isJSON = contentType && contentType.includes("application/json");
+        const data = isJSON ? await res.json() : await res.text();
+
+        if (res.status === 401) {
+          console.warn("⚠️ Token expired or unauthorized");
+          chrome.storage.local.remove(["token", "sessionId"]);
+        }
+
+        sendResponse({
+          success: res.ok,
+          status: res.status,
+          data,
+        });
+      } catch (err) {
+        console.error("❌ AUTH_FETCH error:", err);
+        sendResponse({ success: false, error: err.message });
+      }
+    });
+
+    return true; // Keep async message channel open
+  }
+});
