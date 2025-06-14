@@ -242,10 +242,6 @@
 
             const serverDownErrors = [
               "net::ERR_FAILED",
-              "net::ERR_CONNECTION_REFUSED",
-              "net::ERR_NAME_NOT_RESOLVED",
-              "Failed to load resource: net::ERR_FAILED",
-              "Failed to fetch",
             ];
 
             const isServerDownError = serverDownErrors.some((errStr) =>
