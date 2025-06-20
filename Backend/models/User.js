@@ -10,12 +10,13 @@ const historySchema = new mongoose.Schema({
 });
 
 const userSchema = new mongoose.Schema({
-  email: String,
-  password: String,
-  guardCode: String,
+  email: { type: String, required: true },
+  password: { type: String, required: true },
+  guardCode: { type: String, required: true },
   resetToken: String,
   resetTokenExpiry: Date,
   sessionId: { type: String, default: null },
+  refreshToken: { type: String, default: null }, // 🔐 Added for refresh token logic
   history: [historySchema]
 });
 

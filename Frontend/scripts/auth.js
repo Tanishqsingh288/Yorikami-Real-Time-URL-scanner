@@ -28,7 +28,7 @@ window.addEventListener("DOMContentLoaded", () => {
   if (chrome?.storage?.local) {
     chrome.storage.local.get(["token", "sessionId"], (items) => {
       if (items.token && items.sessionId) {
-        window.location.href = chrome.runtime.getURL('webpages/dashboard.html');
+        window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
       }
     });
   }
@@ -103,7 +103,9 @@ signupForm.addEventListener("submit", async function (e) {
     }
 
     if (res.ok) {
-      alert("✅ Signup successful! Please check your email for your unique Guard Code. Keep it secure and never share it.");
+      alert(
+        "✅ Signup successful! Please check your email for your unique Guard Code. Keep it secure and never share it."
+      );
       toggleForms();
     } else {
       alert(data.error || "❌ Signup failed");
@@ -114,7 +116,6 @@ signupForm.addEventListener("submit", async function (e) {
 });
 
 // Login handler remains unchanged...
-
 
 // ✅ Login
 loginForm.addEventListener("submit", async function (e) {
@@ -134,7 +135,7 @@ loginForm.addEventListener("submit", async function (e) {
 
     const data = await res.json();
 
-    if (res.ok && data.token && data.sessionId) {
+    if (res.ok && data.token && data.refreshToken && data.sessionId) {
       // Store in both localStorage and chrome.storage.local
       localStorage.setItem("token", data.token);
       localStorage.setItem("sessionId", data.sessionId);
@@ -149,16 +150,20 @@ loginForm.addEventListener("submit", async function (e) {
         chrome.storage.local.set(
           {
             token: data.token,
+            refreshToken: data.refreshToken, // ✅ Needed for auto-refresh
             sessionId: data.sessionId,
+            userEmail: email,
           },
           () => {
             console.log("🔐 Token & Session saved to chrome.storage.local");
-            window.location.href = chrome.runtime.getURL('webpages/dashboard.html');
+            window.location.href = chrome.runtime.getURL(
+              "webpages/dashboard.html"
+            );
           }
         );
       } else {
         console.warn("⚠️ chrome.storage.local not available");
-        window.location.href = chrome.runtime.getURL('webpages/dashboard.html');
+        window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
       }
     } else {
       throw new Error(data.error || "Login failed");
@@ -169,9 +174,9 @@ loginForm.addEventListener("submit", async function (e) {
   }
 });
 // Enable/Disable Signup button based on checkbox
-    const checkbox = document.getElementById("signupConfirmCheckbox");
-    const signupBtn = document.getElementById("signupSubmitBtn");
+const checkbox = document.getElementById("signupConfirmCheckbox");
+const signupBtn = document.getElementById("signupSubmitBtn");
 
-    checkbox.addEventListener("change", () => {
-      signupBtn.disabled = !checkbox.checked;
-    });
+checkbox.addEventListener("change", () => {
+  signupBtn.disabled = !checkbox.checked;
+});

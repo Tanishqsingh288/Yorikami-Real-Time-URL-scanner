@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
+const { generateAccessToken, generateRefreshToken } = require('../utils/generateTokens'); // ⬅️ Added
 
 // Setup Nodemailer
 const transporter = nodemailer.createTransport({
@@ -64,9 +65,11 @@ const loginUser = async (req, res) => {
 
     const sessionId = uuidv4();
     user.sessionId = sessionId;
-    await user.save();
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const accessToken = generateAccessToken(user._id);            // ⬅️ Access Token
+    const refreshToken = generateRefreshToken(user._id);          // ⬅️ Refresh Token
+    user.refreshToken = refreshToken;                             // ⬅️ Store refresh token
+    await user.save();
 
     await transporter.sendMail({
       to: email,
@@ -80,7 +83,7 @@ const loginUser = async (req, res) => {
       `
     });
 
-    res.json({ token, sessionId });
+    res.json({ token: accessToken, refreshToken, sessionId }); // ⬅️ Send both tokens
   } catch (error) {
     res.status(500).json({ error: 'Login failed', message: error.message });
   }
@@ -106,24 +109,20 @@ const resetPassword = async (req, res) => {
   const { newPassword, guardCode } = req.body;
 
   try {
-    // Ensure new password and guard code are provided
     if (!newPassword || !guardCode) {
       return res.status(400).json({ error: 'New password and guard code are required' });
     }
 
-    // Find user by guard code
     const user = await User.findOne({ guardCode });
     if (!user) {
       return res.status(404).json({ error: 'Invalid guard code or user not found' });
     }
 
-    // Check if new password is the same as the old one
     const isSame = await bcrypt.compare(newPassword, user.password);
     if (isSame) {
       return res.status(400).json({ error: 'New password cannot be the same as the old password' });
     }
 
-    // Hash and save new password
     user.password = await bcrypt.hash(newPassword, 10);
     await user.save();
     await transporter.sendMail({
@@ -146,7 +145,6 @@ const resetPassword = async (req, res) => {
     res.status(500).json({ error: 'Password reset failed', message: error.message });
   }
 };
-
 
 // Delete user
 const deleteUser = async (req, res) => {
@@ -172,7 +170,6 @@ const deleteUser = async (req, res) => {
       `
     });
 
-
     await User.deleteOne({ _id: user._id });
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
@@ -190,7 +187,8 @@ const logoutUser = async (req, res) => {
       return res.status(403).json({ error: 'Unauthorized or incorrect guard code' });
     }
 
-    user.sessionId = null; // invalidate session
+    user.sessionId = null;
+    user.refreshToken = null; // ⬅️ Invalidate refresh token
     await user.save();
 
     await transporter.sendMail({
@@ -208,6 +206,29 @@ const logoutUser = async (req, res) => {
     res.json({ message: 'User logged out successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Logout failed', message: error.message });
+  }
+};
+
+// 🔁 Refresh Token Handler
+const refreshAccessToken = async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(401).json({ error: 'Refresh token missing' });
+  }
+
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const user = await User.findById(decoded.userId);
+
+    if (!user || user.refreshToken !== refreshToken) {
+      return res.status(403).json({ error: 'Invalid refresh token' });
+    }
+
+    const newAccessToken = generateAccessToken(user._id);
+    res.json({ token: newAccessToken });
+  } catch (error) {
+    res.status(403).json({ error: 'Refresh token expired or invalid' });
   }
 };
 
@@ -251,8 +272,8 @@ module.exports = {
   loginUser,
   getUserHistory,
   resetPassword,
-  //resetPasswordWithToken,
   deleteUser,
   logoutUser,
-  updateEmail
+  updateEmail,
+  refreshAccessToken // ⬅️ Exported new refresh handler
 };

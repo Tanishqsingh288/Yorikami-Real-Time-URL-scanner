@@ -5,24 +5,23 @@ const {
   loginUser,
   getUserHistory,
   resetPassword,
-  resetPasswordWithToken,
   deleteUser,
   logoutUser,
-  updateEmail
+  updateEmail,
+  refreshAccessToken // ⬅️ added
 } = require('../controllers/authController');
-const verifySession = require('../middlewares/verifySession');
+const verifyToken = require('../middlewares/verifyToken'); // If you use this, apply it to protected routes
 
+// Public routes
+router.post('/signup', signupUser);
+router.post('/login', loginUser);
+router.post('/reset-password', resetPassword);
+router.post('/refresh-token', refreshAccessToken); // ⬅️ added
 
-// ✅ Public Routes
-router.post('/signup', signupUser); //Tested OK
-router.post('/login', loginUser);   //Tested OK
-router.post('/reset-password', resetPassword);    //Tested OK
-//router.post('/reset-password/:token', resetPasswordWithToken);     //Tested OK
-
-// ✅ Protected Routes (require valid JWT token)
-router.get('/history', verifySession, getUserHistory);    //Tested OK
-router.post('/logout', verifySession, logoutUser);     //Tested OK
-router.delete('/delete', verifySession, deleteUser);    
-router.put('/update-email', verifySession, updateEmail);
+// Protected routes
+router.get('/history', verifyToken, getUserHistory); // Example
+router.post('/logout', verifyToken, logoutUser);
+router.post('/delete', verifyToken, deleteUser);
+router.put('/update-email', verifyToken, updateEmail);
 
 module.exports = router;
