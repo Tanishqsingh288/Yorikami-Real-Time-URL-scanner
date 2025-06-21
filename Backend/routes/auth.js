@@ -21,7 +21,7 @@ router.post('/refresh-token', refreshAccessToken); // ⬅️ added
 // Protected routes
 router.get('/history', verifyToken, getUserHistory); // Example
 router.post('/logout', verifyToken, logoutUser);
-router.post('/delete', verifyToken, deleteUser);
+router.delete('/delete', verifyToken, deleteUser);
 router.put('/update-email', verifyToken, updateEmail);
 
 module.exports = router;
