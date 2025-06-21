@@ -53,8 +53,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           method: message.method || "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}`,
-            ...(message.headers || {})
+            Authorization: `Bearer ${accessToken}`,
+            "x-session-id": items.sessionId || "",
+            ...(message.headers || {}),
           },
           body: message.body ? JSON.stringify(message.body) : undefined,
         });
@@ -67,15 +68,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (res.status === 401 && refreshToken) {
           console.warn("🔁 Access token expired. Attempting to refresh...");
 
-          const refreshRes = await fetch("https://yorikamiscanner.duckdns.org/api/auth/refresh-token", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ refreshToken }),
-          });
+          const refreshRes = await fetch(
+            "https://yorikamiscanner.duckdns.org/api/auth/refresh-token",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ refreshToken }),
+            }
+          );
 
-          if (refreshRes.ok) {
-            const { token: newToken } = await refreshRes.json();
-            token = newToken;
+          const refreshData = await refreshRes.json();
+
+          if (refreshRes.ok && refreshData.token) {
+            token = refreshData.token;
 
             // Store new token
             await chrome.storage.local.set({ token });
@@ -84,9 +89,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             res = await makeRequest(token);
           } else {
             console.warn("❌ Refresh token invalid or expired. Logging out...");
-            chrome.storage.local.remove(["token", "refreshToken", "sessionId", "userEmail"]);
+            chrome.storage.local.remove([
+              "token",
+              "refreshToken",
+              "sessionId",
+              "userEmail",
+            ]);
             chrome.runtime.sendMessage({ type: "AUTH_EXPIRED" }); // Inform UI
-            sendResponse({ success: false, error: "Session expired. Please log in again." });
+            sendResponse({
+              success: false,
+              error: "Session expired. Please log in again.",
+            });
             return;
           }
         }

@@ -3,8 +3,52 @@ const loginForm = document.getElementById("loginForm");
 const signupForm = document.getElementById("signupForm");
 const toggleText = document.getElementById("toggleText");
 const formTitle = document.getElementById("formTitle");
-
+const TOKEN_REFRESH_INTERVAL = 1 * 60 * 1000;
 const BASE_URL = "https://yorikamiscanner.duckdns.org";
+
+
+
+// ✅ Add this helper function for token refresh
+async function refreshAuthToken() {
+  try {
+    const { refreshToken } = await new Promise(resolve =>
+      chrome.storage.local.get(['refreshToken'], resolve)
+    );
+
+    if (!refreshToken) throw new Error("No refresh token available");
+
+    const res = await fetch(`${BASE_URL}/api/auth/refresh-token`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken })
+    });
+
+    if (res.ok) {
+      const { token } = await res.json();
+
+      localStorage.setItem("token", token);
+      if (chrome?.storage?.local) {
+        await new Promise(resolve =>
+          chrome.storage.local.set({ token }, resolve)
+        );
+      }
+      return token;
+    }
+    throw new Error("Refresh failed");
+  } catch (err) {
+    console.error("Token refresh failed:", err);
+    localStorage.removeItem("token");
+    localStorage.removeItem("sessionId");
+    if (chrome?.storage?.local) {
+      await new Promise(resolve =>
+        chrome.storage.local.remove(['token', 'sessionId', 'refreshToken'], resolve)
+      );
+    }
+    window.location.href = "../auth/auth.html";
+    return null;
+  }
+}
+
 
 // Attach toggle link
 function attachToggleListener() {
@@ -117,7 +161,7 @@ signupForm.addEventListener("submit", async function (e) {
 
 // Login handler remains unchanged...
 
-// ✅ Login
+/// ✅ Login
 loginForm.addEventListener("submit", async function (e) {
   e.preventDefault();
   alert("🔐 You are logged in.");
@@ -150,12 +194,17 @@ loginForm.addEventListener("submit", async function (e) {
         chrome.storage.local.set(
           {
             token: data.token,
-            refreshToken: data.refreshToken, // ✅ Needed for auto-refresh
+            refreshToken: data.refreshToken,
             sessionId: data.sessionId,
             userEmail: email,
           },
           () => {
             console.log("🔐 Token & Session saved to chrome.storage.local");
+            // Start token refresh interval AFTER storage is confirmed
+            setInterval(async () => {
+              await refreshAuthToken();
+            }, TOKEN_REFRESH_INTERVAL);
+            
             window.location.href = chrome.runtime.getURL(
               "webpages/dashboard.html"
             );
