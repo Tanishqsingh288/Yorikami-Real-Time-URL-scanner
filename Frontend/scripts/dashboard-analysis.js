@@ -1,3 +1,5 @@
+// ✅ dashboard-analysis.js
+
 async function authFetch(url, options = {}) {
   const { token, sessionId } = await new Promise(resolve => 
     chrome.storage.local.get(['token', 'sessionId'], resolve)
@@ -15,7 +17,7 @@ async function authFetch(url, options = {}) {
   };
 
   let response = await fetch(url, options);
-  
+
   if (response.status === 401) {
     const newToken = await refreshAuthToken();
     if (newToken) {
@@ -87,7 +89,8 @@ window.addEventListener("DOMContentLoaded", () => {
     `;
     document.body.prepend(analyseStatus);
 
-    const analyzePromises = deepUrls.map(async (url) => {
+    const analyzePromises = deepUrls.map(async (item) => {
+      const url = typeof item === "string" ? item : item.url;
       try {
         const res = await authFetch("https://yorikamiscanner.duckdns.org/api/check/analyze", {
           method: "POST",
