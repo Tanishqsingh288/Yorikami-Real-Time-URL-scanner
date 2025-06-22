@@ -1,19 +1,14 @@
+const BASE_API_URL = "https://yorikamiscanner.duckdns.org";
+
 (async function () {
-  console.log("✅ Yorikami Realtime Scanner is running");
   const startTime = performance.now();
 
-  // Test storage access
   try {
     await chrome.storage.local.set({ storageTest: "test" });
-    console.log("✔ Storage test successful");
-  } catch (error) {
-    console.error("❌ Initial storage test failed:", error);
-  }
+  } catch {}
 
-  // Function to display server error message
   function showServerError() {
-    const existingError = document.getElementById("server-error-message");
-    if (existingError) return;
+    if (document.getElementById("server-error-message")) return;
 
     const errorDiv = document.createElement("div");
     errorDiv.id = "server-error-message";
@@ -30,15 +25,11 @@
       max-width: 300px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     `;
-    errorDiv.textContent =
-      "⚠️ Yorikami Server is Down. Please try again later.";
-
+    errorDiv.textContent = "⚠️ Yorikami Server is Down. Please try again later.";
     document.body.appendChild(errorDiv);
-
-    setTimeout(() => {
-      errorDiv.remove();
-    }, 5000);
+    setTimeout(() => errorDiv.remove(), 5000);
   }
+
   function checkHttpRedirect(url) {
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage(
@@ -54,7 +45,6 @@
     });
   }
 
-  // Function to validate URLs
   function isValidUrl(url) {
     try {
       new URL(url);
@@ -64,25 +54,19 @@
     }
   }
 
-  // Collect all links from the page
   const allLinks = Array.from(document.querySelectorAll("a"))
     .map((a) => {
       const rawHref = (a.getAttribute("href") || "").trim();
       return {
         rawHref,
         url: a.href.trim(),
-        title: (a.innerText || a.getAttribute("title") || a.href)
-          .trim()
-          .substring(0, 50),
+        title: (a.innerText || a.getAttribute("title") || a.href).trim().substring(0, 50),
       };
     })
-    .filter(
-      (link) =>
-        (link.rawHref.startsWith("http") || link.rawHref.startsWith("//")) &&
-        isValidUrl(link.url)
+    .filter((link) =>
+      (link.rawHref.startsWith("http") || link.rawHref.startsWith("//")) && isValidUrl(link.url)
     );
 
-  // Remove duplicates
   const seen = new Set();
   const uniqueLinks = allLinks.filter((link) => {
     if (!seen.has(link.url)) {
@@ -92,14 +76,8 @@
     return false;
   });
 
-  if (uniqueLinks.length === 0) {
-    console.warn("❌ No valid links found.");
-    return;
-  }
+  if (uniqueLinks.length === 0) return;
 
-  console.log(`🔍 Found ${uniqueLinks.length} unique URLs`);
-
-  // Create popup UI
   const popup = document.createElement("div");
   popup.id = "webguardx-popup";
   popup.style.cssText = `
@@ -133,13 +111,11 @@
   const analyseStatus = document.getElementById("analyse-status");
   const timeDisplay = document.getElementById("scan-time");
 
-  // Update timer
   const timerInterval = setInterval(() => {
     const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
     timeDisplay.textContent = `⏱️ ${elapsed}s elapsed`;
   }, 100);
 
-  // Scan URLs
   const unsafeUrls = [];
   const cache = new Map();
   let serverErrorOccurred = false;
@@ -147,47 +123,30 @@
   try {
     await Promise.allSettled(
       uniqueLinks.map(async ({ rawHref, url, title }) => {
-        // Check for insecure HTTP URLs
         if (rawHref.startsWith("http://")) {
           try {
             const response = await checkHttpRedirect(url);
-            console.log("🔁 Checked redirect for", url, "Result:", response);
-
             if (response?.redirectsToHttps === false) {
               const li = document.createElement("li");
-              li.innerHTML = `
-        🚨 <strong style="color: red;"></strong> 
-        <span style="color: #ffcc00; font-weight: bold;">${title}</span>
-      `;
+              li.innerHTML = `🚨 <strong style="color: red;"></strong> <span style="color: #ffcc00; font-weight: bold;">${title}</span>`;
               resultList.appendChild(li);
               unsafeUrls.push({ url, title });
               highlightUnsafeLink(url);
             } else {
-              // Safe — don't show or push anything
               cache.set(url, "safe");
             }
-          } catch (err) {
-            console.warn("⚠️ Could not verify HTTP redirect for:", url, err);
-            // Only fallback to unsafe if truly needed
+          } catch {
             const li = document.createElement("li");
-            li.innerHTML = `
-      ⚠️ <strong style="color: orange;">Unverified:</strong> 
-      <span style="color: #ffcc00; font-weight: bold;">${title}</span>
-    `;
+            li.innerHTML = `⚠️ <strong style="color: orange;">Unverified:</strong> <span style="color: #ffcc00; font-weight: bold;">${title}</span>`;
             resultList.appendChild(li);
             unsafeUrls.push({ url, title });
             highlightUnsafeLink(url);
           }
-
-          return; // Ensure each URL is only handled once
+          return;
         }
 
-        // Highlight unsafe links early for HTTP
-        unsafeUrls.forEach(({ url }) => {
-          highlightUnsafeLink(url);
-        });
+        unsafeUrls.forEach(({ url }) => highlightUnsafeLink(url));
 
-        // Check for protocol-relative URLs on HTTP pages
         if (rawHref.startsWith("//") && window.location.protocol === "http:") {
           const li = document.createElement("li");
           li.innerHTML = `<span style="color: #ff884d;">⚠️ Insecure Protocol-Relative: ${title}</span>`;
@@ -196,77 +155,50 @@
           return;
         }
 
-        // Skip already checked URLs
         if (cache.has(url)) return;
 
         try {
           const controller = new AbortController();
           const timeout = setTimeout(() => controller.abort(), 5000);
 
-          const res = await fetch(
-            "https://yorikamiscanner.duckdns.org/api/links/check",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ urls: [url] }),
-              signal: controller.signal,
-            }
-          );
+          const res = await fetch(`${BASE_API_URL}/api/links/check`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ urls: [url] }),
+            signal: controller.signal,
+          });
 
           clearTimeout(timeout);
 
-          if (!res.ok) {
-            throw new Error(`Server responded with status ${res.status}`);
-          }
+          if (!res.ok) throw new Error(`Server responded with status ${res.status}`);
 
           const data = await res.json();
           if (data.unsafeUrls && data.unsafeUrls.includes(url)) {
             const li = document.createElement("li");
-
-            li.innerHTML = `
-              🚨 <strong style="color: red;">Insecure:</strong> 
-              <span style="color: #ffcc00; font-weight: bold;">${title}</span>
-            `;
-
+            li.innerHTML = `🚨 <strong style="color: red;">Insecure:</strong> <span style="color: #ffcc00; font-weight: bold;">${title}</span>`;
             resultList.appendChild(li);
             unsafeUrls.push({ url, title });
           } else {
             cache.set(url, "safe");
           }
         } catch (err) {
-          console.error(`❌ Failed to check ${url}`, err);
-
-          if (!serverErrorOccurred) {
-            const msg = err.message || "";
-            const name = err.name || "";
-
-            const serverDownErrors = [
-              "net::ERR_FAILED",
-            ];
-
-            const isServerDownError = serverDownErrors.some((errStr) =>
-              msg.includes(errStr)
-            );
-
-            if (isServerDownError) {
-              serverErrorOccurred = true;
-              showServerError();
-              return;
-            }
+          const msg = err.message || "";
+          const serverDownErrors = ["net::ERR_FAILED"];
+          const isServerDownError = serverDownErrors.some((errStr) => msg.includes(errStr));
+          if (!serverErrorOccurred && isServerDownError) {
+            serverErrorOccurred = true;
+            showServerError();
+            return;
           }
         }
       })
     );
-  } catch (error) {
-    console.error("Error during URL scanning:", error);
-  }
+  } catch {}
 
-  // Clean up and show results
   clearInterval(timerInterval);
   const totalTime = ((performance.now() - startTime) / 1000).toFixed(2);
   timeDisplay.textContent = `✅ Scan completed in ${totalTime}s`;
 
-  // Add close button
   const closeBtn = document.createElement("span");
   closeBtn.textContent = "✖";
   closeBtn.style.cssText = `
@@ -281,55 +213,35 @@
   closeBtn.addEventListener("click", () => popup.remove());
   popup.appendChild(closeBtn);
 
-  // Save results to storage
   try {
     await chrome.storage.local.set({ deepUrls: unsafeUrls });
-    console.log("✔ Saved unsafe URLs to storage");
-  } catch (error) {
-    console.error("❌ Failed to save unsafe URLs:", error);
-  }
+  } catch {}
 
-  // Update UI based on results
   if (unsafeUrls.length === 0 && !serverErrorOccurred) {
     resultList.innerHTML = `<li style="color:lightgreen;">✅ No unsafe or insecure URLs found</li>`;
-
     analyseBtn.style.display = "none";
 
-    // Create Go to Dashboard button
     const goToDashBtn = document.createElement("button");
     goToDashBtn.textContent = "Go to Dashboard";
     goToDashBtn.style.cssText = `
-      margin-top: 10px; 
-      background: #008CBA; 
-      color: white; 
-      border: none; 
-      padding: 6px 10px; 
-      border-radius: 5px; 
+      margin-top: 10px;
+      background: #008CBA;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 5px;
       cursor: pointer;
       font-size: 14px;
     `;
-
     popup.appendChild(goToDashBtn);
 
     goToDashBtn.addEventListener("click", async () => {
       goToDashBtn.disabled = true;
       try {
-        const { token, sessionId } = await chrome.storage.local.get([
-          "token",
-          "sessionId",
-        ]);
-
-        if (token && sessionId) {
-          // Logged in, redirect to dashboard
-          window.location.href = chrome.runtime.getURL(
-            "webpages/dashboard.html"
-          );
-        } else {
-          // Not logged in, redirect to auth
-          window.location.href = chrome.runtime.getURL("webpages/auth.html");
-        }
-      } catch (err) {
-        console.error("Error checking login status:", err);
+        const { token, sessionId } = await chrome.storage.local.get(["token", "sessionId"]);
+        const nextPage = token && sessionId ? "dashboard.html" : "auth.html";
+        window.location.href = chrome.runtime.getURL(`webpages/${nextPage}`);
+      } catch {
         goToDashBtn.disabled = false;
       }
     });
@@ -337,7 +249,6 @@
     analyseBtn.style.display = "inline-block";
   }
 
-  // Handle deep analysis button click
   analyseBtn?.addEventListener("click", async () => {
     if (!analyseBtn) return;
 
@@ -345,11 +256,7 @@
     analyseStatus.innerText = "⏳ Preparing Deep Analysis...";
 
     try {
-      const { token, sessionId } = await chrome.storage.local.get([
-        "token",
-        "sessionId",
-      ]);
-
+      const { token, sessionId } = await chrome.storage.local.get(["token", "sessionId"]);
       if (!token || !sessionId) {
         analyseStatus.innerText = "Redirecting to login...";
         setTimeout(() => {
@@ -358,7 +265,6 @@
         return;
       }
 
-      // Ensure we have the latest unsafe URLs
       const { deepUrls } = await chrome.storage.local.get("deepUrls");
       if (!deepUrls || deepUrls.length === 0) {
         await chrome.storage.local.set({ deepUrls: unsafeUrls });
@@ -367,53 +273,8 @@
       analyseStatus.innerText = "🔁 Redirecting to dashboard...";
       window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
     } catch (error) {
-      console.error("Error during deep analysis setup:", error);
       analyseStatus.innerText = "❌ Error: " + error.message;
       analyseBtn.disabled = false;
     }
   });
 })();
-function highlightUnsafeLink(unsafeUrl) {
-  const anchors = document.querySelectorAll("a");
-
-  anchors.forEach((anchor) => {
-    if (anchor.href.trim() === unsafeUrl.trim()) {
-      anchor.dataset.originalColor = anchor.style.color;
-      anchor.style.color = "#FFD700"; // Bright yellow
-      anchor.style.backgroundColor = "#2b2b2b";
-      anchor.style.fontWeight = "bold";
-      anchor.title = "⚠️ This link was flagged as unsafe by Yorikami Scanner";
-
-      // Apply highlight recursively to all inner elements
-      highlightChildren(anchor);
-    }
-  });
-
-  function highlightChildren(element) {
-    function playNotificationSound() {
-      const audio = new Audio(
-        chrome.runtime.getURL("graphical-assets/soft_notification.mp3")
-      );
-      audio.volume = 0.6; // Optional: adjust volume
-      audio.play().catch((err) => {
-        console.error("Audio playback failed:", err);
-      });
-    }
-
-    const children = element.children;
-    if (children.length === 0) {
-      // Leaf node
-      //element.style.backgroundColor = "#000000";
-      element.style.color = "#fff200";
-      element.style.fontWeight = "bold";
-      return;
-    }
-
-    for (let child of children) {
-      //child.style.backgroundColor = "#000000";
-      child.style.color = "#fff200";
-      child.style.fontWeight = "bold";
-      highlightChildren(child); // Recurse
-    }
-  }
-}

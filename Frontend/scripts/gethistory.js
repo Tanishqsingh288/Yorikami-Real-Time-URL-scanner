@@ -76,41 +76,69 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function renderTable(history) {
-    historyTableBody.innerHTML = "";
-    history.forEach((item, index) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${index + 1}</td>
-        <td>
-          <a href="${item.url}" target="_blank" rel="noopener noreferrer"
-            style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
-            overflow: hidden; text-overflow: ellipsis; word-break: break-word;
-            white-space: normal; line-height: 1.4; max-width: 400px;
-            color: blue; text-decoration: underline; cursor: default;
-            pointer-events: none; user-select: text;">
-            ${item.url}
-          </a>
-        </td>
-        <td>${new Date(item.timestamp).toLocaleString()}</td>
-        <td>
-          <button class="btn btn-sm btn-success reanalyze-btn" data-url="${item.url}">Re-analyse</button>
-          <button class="btn btn-sm btn-danger delete-btn" data-url="${item.url}">Delete</button>
-        </td>
-        <td><span class="badge bg-${getRatingColor(item.rating)}" style="color: #fff;">
-          ${item.finalScore}/10 (${item.rating})</span></td>
-      `;
-      historyTableBody.appendChild(row);
-    });
+function renderTable(history) {
+  const emptyMessage = document.getElementById("emptyMessage");
 
-    document.querySelectorAll(".reanalyze-btn").forEach(btn =>
-      btn.addEventListener("click", () => reanalyze(btn.dataset.url))
-    );
+  // Clear table body
+  historyTableBody.innerHTML = "";
 
-    document.querySelectorAll(".delete-btn").forEach(btn =>
-      btn.addEventListener("click", () => deleteUrl(btn.dataset.url))
-    );
+  // Handle empty history
+  if (!Array.isArray(history) || history.length === 0) {
+    console.warn("⚠️ No history data to render.");
+
+    if (emptyMessage) {
+      emptyMessage.style.display = "block";
+    }
+
+    alert("📭 Your deeply scanned URLs will be listed here.");
+    return;
   }
+
+  // Hide empty message if data exists
+  if (emptyMessage) {
+    emptyMessage.style.display = "none";
+  }
+
+  // Render table rows
+  history.forEach((item, index) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>
+        <a href="${item.url}" target="_blank" rel="noopener noreferrer"
+          style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+          overflow: hidden; text-overflow: ellipsis; word-break: break-word;
+          white-space: normal; line-height: 1.4; max-width: 400px;
+          color: blue; text-decoration: underline; cursor: default;
+          pointer-events: none; user-select: text;">
+          ${item.url}
+        </a>
+      </td>
+      <td>${new Date(item.timestamp).toLocaleString()}</td>
+      <td>
+        <button class="btn btn-sm btn-success reanalyze-btn" data-url="${item.url}">Re-analyse</button>
+        <button class="btn btn-sm btn-danger delete-btn" data-url="${item.url}">Delete</button>
+      </td>
+      <td>
+        <span class="badge bg-${getRatingColor(item.rating)}" style="color: #fff;">
+          ${item.finalScore}/10 (${item.rating})
+        </span>
+      </td>
+    `;
+    historyTableBody.appendChild(row);
+  });
+
+  // Attach button actions
+  document.querySelectorAll(".reanalyze-btn").forEach(btn =>
+    btn.addEventListener("click", () => reanalyze(btn.dataset.url))
+  );
+
+  document.querySelectorAll(".delete-btn").forEach(btn =>
+    btn.addEventListener("click", () => deleteUrl(btn.dataset.url))
+  );
+}
+
+
 
   async function fetchSortedHistory(route = "history/time/recent-first") {
     try {
