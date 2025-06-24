@@ -120,6 +120,22 @@ const BASE_API_URL = "https://yorikamiscanner.duckdns.org";
   const cache = new Map();
   let serverErrorOccurred = false;
 
+  function highlightUnsafeLink(unsafeUrl) {
+  const links = document.querySelectorAll("a");
+  links.forEach((link) => {
+    if (link.href === unsafeUrl) {
+      link.style.backgroundColor = "#ffcc00"; // yellow background
+      link.style.color = "#000";              // black text for readability
+      link.style.fontWeight = "bold";
+      link.style.padding = "2px 4px";
+      link.style.borderRadius = "3px";
+      link.style.textDecoration = "none";
+      link.title = "⚠️ This link is flagged as unsafe";
+    }
+  });
+}
+
+
   try {
     await Promise.allSettled(
       uniqueLinks.map(async ({ rawHref, url, title }) => {
@@ -178,6 +194,7 @@ const BASE_API_URL = "https://yorikamiscanner.duckdns.org";
             li.innerHTML = `🚨 <strong style="color: red;">Insecure:</strong> <span style="color: #ffcc00; font-weight: bold;">${title}</span>`;
             resultList.appendChild(li);
             unsafeUrls.push({ url, title });
+            highlightUnsafeLink(url);
           } else {
             cache.set(url, "safe");
           }
