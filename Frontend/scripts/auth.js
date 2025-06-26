@@ -6,9 +6,7 @@ const formTitle = document.getElementById("formTitle");
 const TOKEN_REFRESH_INTERVAL = 1 * 60 * 1000;
 const BASE_URL = "https://yorikamiscanner.duckdns.org";
 
-
-
-// ✅ Add this helper function for token refresh
+// Helper function for token refresh
 async function refreshAuthToken() {
   try {
     const { refreshToken } = await new Promise(resolve =>
@@ -36,7 +34,6 @@ async function refreshAuthToken() {
     }
     throw new Error("Refresh failed");
   } catch (err) {
-    console.error("Token refresh failed:", err);
     localStorage.removeItem("token");
     localStorage.removeItem("sessionId");
     if (chrome?.storage?.local) {
@@ -48,7 +45,6 @@ async function refreshAuthToken() {
     return null;
   }
 }
-
 
 // Attach toggle link
 function attachToggleListener() {
@@ -135,13 +131,10 @@ signupForm.addEventListener("submit", async function (e) {
     });
 
     const text = await res.text();
-    console.log("🔍 Raw signup response:", text);
-
     let data;
     try {
       data = JSON.parse(text);
     } catch (e) {
-      console.error("❌ Failed to parse JSON from signup response:", e);
       alert("❌ Invalid response from server.");
       return;
     }
@@ -159,9 +152,7 @@ signupForm.addEventListener("submit", async function (e) {
   }
 });
 
-// Login handler remains unchanged...
-
-/// ✅ Login
+// Login handler
 loginForm.addEventListener("submit", async function (e) {
   e.preventDefault();
   alert("🔐 You are logged in.");
@@ -180,15 +171,9 @@ loginForm.addEventListener("submit", async function (e) {
     const data = await res.json();
 
     if (res.ok && data.token && data.refreshToken && data.sessionId) {
-      // Store in both localStorage and chrome.storage.local
       localStorage.setItem("token", data.token);
       localStorage.setItem("sessionId", data.sessionId);
       localStorage.setItem("userEmail", email);
-      console.log("📦 Saved to localStorage:", {
-        token: localStorage.getItem("token"),
-        sessionId: localStorage.getItem("sessionId"),
-        userEmail: email,
-      });
 
       if (chrome?.storage?.local) {
         chrome.storage.local.set(
@@ -199,8 +184,6 @@ loginForm.addEventListener("submit", async function (e) {
             userEmail: email,
           },
           () => {
-            console.log("🔐 Token & Session saved to chrome.storage.local");
-            // Start token refresh interval AFTER storage is confirmed
             setInterval(async () => {
               await refreshAuthToken();
             }, TOKEN_REFRESH_INTERVAL);
@@ -211,17 +194,16 @@ loginForm.addEventListener("submit", async function (e) {
           }
         );
       } else {
-        console.warn("⚠️ chrome.storage.local not available");
         window.location.href = chrome.runtime.getURL("webpages/dashboard.html");
       }
     } else {
       throw new Error(data.error || "Login failed");
     }
   } catch (err) {
-    console.error("❌ Login error:", err);
     alert("❌ Login error: " + (err?.message || "Unknown error"));
   }
 });
+
 // Enable/Disable Signup button based on checkbox
 const checkbox = document.getElementById("signupConfirmCheckbox");
 const signupBtn = document.getElementById("signupSubmitBtn");

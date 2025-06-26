@@ -174,7 +174,7 @@ function renderTable(history) {
         alert("Re-analysis failed");
       }
     } catch (err) {
-      console.error("Re-analysis error:", err.message);
+      console.error("", err.message);
     }
   };
 
@@ -200,8 +200,8 @@ function renderTable(history) {
           });
 
           res.ok
-            ? console.log(`✅ Analysed: ${url}`)
-            : console.warn(`⚠️ Failed to analyse ${url}`);
+            ? console.log(``)
+            : console.warn(``);
         }
 
         popup.textContent = "✅ Deep analysis complete! Refreshing...";
@@ -211,7 +211,7 @@ function renderTable(history) {
           fetchSortedHistory();
         }, 1500);
       } catch (err) {
-        console.error("❌ Deep analysis failed:", err.message);
+        console.error("", err.message);
         popup.textContent = "❌ Analysis failed.";
         setTimeout(() => popup.remove(), 2000);
       }
@@ -292,8 +292,8 @@ function renderTable(history) {
         });
 
         res.ok
-          ? console.log(`✅ Auto-analysed: ${url}`)
-          : console.warn(`⚠️ Failed auto-analysis for: ${url}`);
+          ? console.log(`:`)
+          : console.warn(``);
       }
 
       popup.textContent = "✅ Auto analysis complete!";
@@ -303,7 +303,7 @@ function renderTable(history) {
         location.reload();
       }, 1500);
     } catch (err) {
-      console.error("❌ Auto deep analysis failed:", err.message);
+      console.error("", err.message);
       popup.textContent = "❌ Auto analysis failed.";
       setTimeout(() => popup.remove(), 2000);
     }

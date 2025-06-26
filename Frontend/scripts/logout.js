@@ -44,7 +44,7 @@ document.getElementById("logoutForm").addEventListener("submit", async function 
       // Clear chrome.storage.local if available
       if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
         chrome.storage.local.remove(['token', 'sessionId'], () => {
-          console.log('Removed from chrome.storage.local');
+          //console.log('Removed from chrome.storage.local');
         });
       }
       
@@ -60,6 +60,6 @@ document.getElementById("logoutForm").addEventListener("submit", async function 
     }
   } catch (err) {
     document.getElementById("message").innerText = "Logout failed. Please try again.";
-    console.error("Logout error:", err);
+    //console.error("Logout error:", err);
   }
 });

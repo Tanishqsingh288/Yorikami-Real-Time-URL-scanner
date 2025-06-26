@@ -1,5 +1,3 @@
-// ✅ dashboard-analysis.js
-
 async function authFetch(url, options = {}) {
   const { token, sessionId } = await new Promise(resolve => 
     chrome.storage.local.get(['token', 'sessionId'], resolve)
@@ -52,7 +50,6 @@ async function refreshAuthToken() {
     }
     throw new Error("Token refresh failed");
   } catch (err) {
-    console.error("❌ Token refresh error:", err.message);
     chrome.storage.local.remove(['token', 'sessionId', 'refreshToken']);
     window.location.href = "../auth/auth.html";
     return null;
@@ -64,13 +61,11 @@ window.addEventListener("DOMContentLoaded", () => {
     const { token, sessionId, deepUrls, reanalyzeTriggered } = data;
 
     if (!token || !sessionId) {
-      console.warn("❌ Missing token or sessionId");
       window.location.href = "../auth/auth.html";
       return;
     }
 
     if (!deepUrls || !Array.isArray(deepUrls) || deepUrls.length === 0) {
-      console.warn("⚠️ No deepUrls to process.");
       return;
     }
 
@@ -99,26 +94,21 @@ window.addEventListener("DOMContentLoaded", () => {
         });
 
         if (!res.ok) {
-          console.warn(`⚠️ Failed to analyze: ${url}, status: ${res.status}`);
           return { url, status: "error", code: res.status };
         }
-        console.log(`✅ Successfully analysed: ${url}`);
         return { url, status: "ok" };
       } catch (err) {
-        console.error(`❌ Error analyzing ${url}:`, err);
         return { url, status: "error", error: err.message };
       }
     });
 
     try {
       const results = await Promise.all(analyzePromises);
-      console.log("🔍 Analysis results:", results);
-
+      
       analyseStatus.innerText = "✅ Deep analysis complete!";
       analyseStatus.style.background = "#a4f9c8";
       analyseStatus.style.color = "#0a0";
     } catch (err) {
-      console.error("❌ Analysis failed:", err);
       analyseStatus.innerText = "❌ Analysis failed!";
       analyseStatus.style.background = "#f9a4a4";
       analyseStatus.style.color = "#a00";
@@ -126,9 +116,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     setTimeout(() => {
       analyseStatus.remove();
-      chrome.storage.local.remove(["deepUrls", "reanalyzeTriggered"], () => {
-        console.log("🧹 Removed deepUrls and reanalyze flag from storage");
-      });
+      chrome.storage.local.remove(["deepUrls", "reanalyzeTriggered"]);
     }, 3000);
   });
 });
