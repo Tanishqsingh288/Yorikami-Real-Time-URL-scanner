@@ -13,9 +13,9 @@ const checkMixedContent = require('../checks/nomixedcontentcheck');
 const checkThirdPartyScripts = require('../checks/thirdpartyscriptscheck');
 
 const User = require("../models/User");
-const NodeCache = require("node-cache");
+// const NodeCache = require("node-cache");
 
-const scanCache = new NodeCache({ stdTTL: 0 }); // Cache TTL = Permanent
+// const scanCache = new NodeCache({ stdTTL: 0 }); // ❌ Cache disabled
 
 async function handleSecurityCheck(req, res) {
   const { url } = req.body;
@@ -23,7 +23,8 @@ async function handleSecurityCheck(req, res) {
     return res.status(400).json({ error: "Invalid URL" });
   }
 
-  // Check cache first
+  // ❌ Check cache first (disabled)
+  /*
   const cached = scanCache.get(url);
   if (cached) {
     return res.json({
@@ -33,6 +34,7 @@ async function handleSecurityCheck(req, res) {
       timestamp: new Date().toISOString(),
     });
   }
+  */
 
   let evaluation = null;
   let failed = false;
@@ -57,7 +59,8 @@ async function handleSecurityCheck(req, res) {
     results.push(...checks);
     evaluation = evaluateResults(results);
 
-    scanCache.set(url, evaluation);
+    // ❌ No more caching the result
+    // scanCache.set(url, evaluation);
 
     res.json({
       url,
@@ -103,6 +106,5 @@ async function handleSecurityCheck(req, res) {
     }
   }
 }
-
 
 module.exports = { handleSecurityCheck };

@@ -1,5 +1,6 @@
+// ✅ This stays in your gethistory.js or a shared file:
 async function authFetch(url, options = {}) {
-  const { token, sessionId } = await new Promise(resolve => 
+  const { token, sessionId } = await new Promise(resolve =>
     chrome.storage.local.get(['token', 'sessionId'], resolve)
   );
 
@@ -56,6 +57,27 @@ async function refreshAuthToken() {
   }
 }
 
+// ✅ 🗝️ Make sure fetchSortedHistory is accessible globally
+window.fetchSortedHistory = async function(route = "history/time/recent-first") {
+  try {
+    const res = await authFetch(`https://yorikamiscanner.duckdns.org/api/user/${route}`);
+    console.log("Fetch response:", res);
+
+    if (!res.ok) throw new Error("History fetch failed");
+
+    const data = await res.json();
+    console.log("API data:", data);
+
+    const history = data.sortedHistory || data.history;
+    console.log("Parsed history:", history);
+
+    if (Array.isArray(history)) renderTable(history);
+  } catch (err) {
+    console.error("Error fetching history:", err.message);
+  }
+};
+
+// ✅ ✅ ✅ Here’s your updated DOMContentLoaded block:
 window.addEventListener("DOMContentLoaded", () => {
   chrome.storage.local.get(["token", "sessionId", "deepUrls", "reanalyzeTriggered"], async (data) => {
     const { token, sessionId, deepUrls, reanalyzeTriggered } = data;
@@ -104,10 +126,14 @@ window.addEventListener("DOMContentLoaded", () => {
 
     try {
       const results = await Promise.all(analyzePromises);
-      
+
       analyseStatus.innerText = "✅ Deep analysis complete!";
       analyseStatus.style.background = "#a4f9c8";
       analyseStatus.style.color = "#0a0";
+
+      // ✅ ✅ ✅ 🗝️ ADDED: Call fetchSortedHistory() to refresh the table
+      fetchSortedHistory();
+
     } catch (err) {
       analyseStatus.innerText = "❌ Analysis failed!";
       analyseStatus.style.background = "#f9a4a4";
