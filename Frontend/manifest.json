@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "YorikamiV1",
   "version": "1.0",
-  "description": "Yorikami: Free Chrome extension scans sites for harmful links in realtime, highlights threats, tracks risks—no tracking, no slowdown.",
+  "description": "Yorikami: Free Chrome extension scans sites for harmful links in realtime, highlights threats,tracks risks—no tracking, no slowdown.",
   "permissions": [
     "storage"
   ],
