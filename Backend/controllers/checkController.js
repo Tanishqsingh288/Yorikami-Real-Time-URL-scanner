@@ -98,7 +98,7 @@ async function handleSecurityCheck(req, res) {
         } else {
           user.history.push(historyEntry);
         }
-
+!
         await user.save();
       }
     } catch (dbError) {
